@@ -45,6 +45,5 @@ const mySms = new sms();
 const myModel = new models('../llama.cpp/examples/myChat.sh');
 
 app.listen(port, () => {
-	console.log(`Example app listening on port ${port}`)
-	console.log('Ready !');
+	console.log('Listening on port ' + port);
 });
