@@ -9,18 +9,19 @@ import { IsPhoneNumber } from '../Utils';
 dotenv.config();
 
 export default function adminAction(phoneNumber: string, message: string, model: models, sms: sms) {
-	if (!process.env.ADMIN_NUMBER?.includes(phoneNumber)) {
-		sms.sendSms(phoneNumber, 'Insufficient permissions');
-		return;
-	}
-
 	message = CleanMessage(message);
 	const command = message.split(' ')[0];
 
+	if (!process.env.ADMIN_NUMBER?.includes(phoneNumber)) {
+		sms.sendSms(phoneNumber, 'Insufficient permissions');
+		if (command == 'ping') {
+			ping(phoneNumber, model, sms);
+		}
+		return;
+	}
+
 	if (command == 'restart') {
 		restart(phoneNumber, model, sms);
-	} else if (command == 'ping') {
-		ping(phoneNumber, model, sms);
 	} else if (command == 'ban') {
 		ban(phoneNumber, message, sms);
 	} else if (command == 'unban') {
