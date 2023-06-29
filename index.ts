@@ -1,6 +1,6 @@
 import express from 'express';
 import models from './models';
-import adminAction from './admin/adminAction';
+import adminAction from './admin/Commands';
 import sms from './smsSender';
 import isBan from './admin/checkBan';
 var app = express();
