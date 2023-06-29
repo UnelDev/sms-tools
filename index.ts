@@ -31,9 +31,9 @@ app.post('/', req => {
 		console.log('[' + chalk.yellow('COMMAND') + ']	\'' + chalk.bold(phoneNumber) + '\': ' + message);
 		adminAction(phoneNumber, message, myModel, mySms);
 	} else {
-		process.stdout.write('[' + chalk.blue('MESSAGE') + ']	\'' + chalk.bold(phoneNumber) + '\': ');
+		process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
 		myModel.send(message, message => {
-			console.log('[' + chalk.blue('MODEL') + ']	' + message);
+			console.log('[' + chalk.green('MODEL') + '] ' + message);
 			mySms.sendSms(phoneNumber, message);
 		});
 	}
