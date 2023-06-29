@@ -53,6 +53,13 @@ function restart(phoneNumber: string, model: models, sms: sms) {
 	model.restart();
 }
 function ban(phoneNumber: string, message: string, sms: sms) {
+	let forceAction = false;
+	if (message.includes('force')) {
+		forceAction = true;
+		message = message.replace('force', '');
+		message = CleanMessage(message);
+		console.log(message);
+	}
 	const messageArray = message.split(' ');
 	if (messageArray.length != 2 && messageArray.length != 3) {
 		sms.sendSms(phoneNumber, 'Syntax: ban <number> [duration]');
@@ -68,6 +75,24 @@ function ban(phoneNumber: string, message: string, sms: sms) {
 			return;
 		}
 	}
+
+	if (!forceAction) {
+		const conv: Array<[string, string, string]> = JSON.parse(fs.readFileSync('./datas/convSave.json')?.toString() ?? '[]');
+		console.log({ conv, messageArray });
+
+		let found = false;
+		conv.forEach((value) => {
+			if (value[0] === messageArray[1]) {
+				found = true;
+				return;
+			}
+		});
+		if (!found) {
+			sms.sendSms(phoneNumber, 'This user has not sent any message. Add "force" to enforce this ban.');
+		}
+
+	}
+
 
 	const banList: Array<[string, Date]> = JSON.parse(fs.readFileSync('./datas/banList.json')?.toString() ?? '[]');
 	const EndDate = new Date(messageArray[2] ? Date.now() + (parseInt(messageArray[2]) * 1000) : 8640000000000000)
