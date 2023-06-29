@@ -20,7 +20,7 @@ app.post('/', req => {
 
 
 	if (isBan(phoneNumber)) {
-		console.log('[' + chalk.yellow('USER') + ']	\'' + chalk.bold(phoneNumber) + '\': Sent a message');
+		console.log('[' + chalk.yellow('BANNED USER') + ']	\'' + chalk.bold(phoneNumber) + '\': Sent a message');
 		return;
 	}
 
