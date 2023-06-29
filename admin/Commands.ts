@@ -8,6 +8,28 @@ import { IsPhoneNumber } from '../Utils';
 
 dotenv.config();
 
+export default function adminAction(phoneNumber: string, message: string, model: models, sms: sms) {
+	if (!process.env.ADMIN_NUMBER?.includes(phoneNumber)) {
+		sms.sendSms(phoneNumber, 'Insufficient permissions');
+		return;
+	}
+
+	message = CleanMessage(message);
+	const command = message.split(' ')[0];
+
+	if (command == 'restart') {
+		restart(phoneNumber, model, sms);
+	} else if (command == 'ping') {
+		ping(phoneNumber, model, sms);
+	} else if (command == 'ban') {
+		ban(phoneNumber, message, sms);
+	} else if (command == 'unban') {
+		unban(phoneNumber, message, sms);
+	} else {
+		sms.sendSms(phoneNumber, 'Unknown command \'' + command + '\'');
+	}
+}
+
 function CleanMessage(message: string) {
 	message = message.toLocaleLowerCase();
 	while (message.startsWith(' ')) { const array = message.split(""); array.shift(); message = array.join("") };
@@ -21,7 +43,7 @@ function ping(phoneNumber: string, model: models, sms: sms) {
 	new Promise(resolve => {
 		model.send('What\'s your name?', resolve);
 	}).then(() => {
-		sms.sendSms(phoneNumber, 'The model respond in ' + (Date.now() - start) + 'ms');
+		sms.sendSms(phoneNumber, 'The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's');
 	});
 }
 
@@ -46,7 +68,7 @@ function ban(phoneNumber: string, message: string, sms: sms) {
 		}
 	}
 
-	const banList: Array<[string, Date]> = JSON.parse(fs.readFileSync('./admin/ban.json')?.toString() ?? '[]');
+	const banList: Array<[string, Date]> = JSON.parse(fs.readFileSync('./datas/banList.json')?.toString() ?? '[]');
 	const EndDate = new Date(messageArray[2] ? Date.now() + (parseInt(messageArray[2]) * 1000) : 8640000000000000)
 	banList.push([messageArray[1], EndDate]);
 	fs.writeFileSync('./datas/banList.json', JSON.stringify(banList));
@@ -55,22 +77,29 @@ function ban(phoneNumber: string, message: string, sms: sms) {
 	sms.sendSms(messageArray[1], 'You\'ve been banned by an administrator');
 }
 
-export default function adminAction(phoneNumber: string, message: string, model: models, sms: sms) {
-	if (!process.env.ADMIN_NUMBER?.includes(phoneNumber)) {
-		sms.sendSms(phoneNumber, 'Insufficient permissions');
+function unban(phoneNumber: string, message: string, sms: sms) {
+	console.log('coucou');
+	const messageArray = message.split(' ');
+	if (messageArray.length != 2) {
+		sms.sendSms(phoneNumber, 'Syntax: unban <number>');
+		return;
+	}
+	if (!IsPhoneNumber(messageArray[1])) {
+		sms.sendSms(phoneNumber, 'Syntax: unban <number>');
 		return;
 	}
 
-	message = CleanMessage(message);
-	const command = message.split(' ')[0];
-
-	if (command == 'restart') {
-		restart(phoneNumber, model, sms);
-	} else if (command == 'ping') {
-		ping(phoneNumber, model, sms);
-	} else if (command == 'ban') {
-		ban(phoneNumber, message, sms);
-	} else {
-		sms.sendSms(phoneNumber, 'Unknown command \'' + command + '\'');
+	const banList: Array<[string, Date]> = JSON.parse(fs.readFileSync('./datas/banList.json')?.toString() ?? '[]');
+	if (banList.length == 0) sms.sendSms(phoneNumber, 'no banned user');
+	let unbanned = false;
+	banList.forEach((element, i) => {
+		if (element[0] == messageArray[1]) {
+			element.splice(i, 1);
+			sms.sendSms(phoneNumber, 'user ' + messageArray[1] + ' unbanned');
+			unbanned = true;
+		}
+	});
+	if (!unbanned) {
+		sms.sendSms(phoneNumber, 'user ' + messageArray[1] + ' not found');
 	}
 }
