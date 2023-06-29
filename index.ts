@@ -6,6 +6,7 @@ import isBan from './admin/checkBan';
 import models from './models';
 import sms from './smsSender';
 import chalk from 'chalk';
+import { logConv } from './log';
 
 const app = express();
 const port = 5000;
@@ -32,9 +33,10 @@ app.post('/', req => {
 		adminAction(phoneNumber, message, myModel, mySms);
 	} else {
 		process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
-		myModel.send(message, message => {
-			console.log('[' + chalk.green('MODEL') + '] ' + message);
-			mySms.sendSms(phoneNumber, message);
+		myModel.send(message, answer => {
+			console.log('[' + chalk.green('MODEL') + '] ' + answer);
+			mySms.sendSms(phoneNumber, answer);
+			logConv(phoneNumber, message, answer);
 		});
 	}
 });

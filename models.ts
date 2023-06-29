@@ -1,5 +1,4 @@
-import { spawn } from "child_process";
-
+import { spawn } from 'child_process';
 export default class models {
 	message: string;
 	childProcess: import("child_process").ChildProcessWithoutNullStreams;
