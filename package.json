@@ -1,23 +1,31 @@
 {
-  "name": "test",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx ts-node index.ts"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^16.3.1",
-    "express": "^4.18.2",
-    "llama-node": "^0.1.6",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.1.3"
-  },
-  "devDependencies": {
-    "@types/express": "^4.17.17",
-    "@types/node": "^20.3.2"
-  }
+	"name": "llama-sms",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.ts",
+	"scripts": {
+		"start": "npx ts-node index.ts"
+	},
+	"contributors": [
+		{
+			"name": "UnelDev",
+			"url": "https://github.com/UnelDev"
+		},
+		{
+			"name": "Wiwok",
+			"url": "https://github.com/Wiwok"
+		}
+	],
+	"license": "ISC",
+	"dependencies": {
+		"dotenv": "^16.3.1",
+		"express": "^4.18.2",
+		"llama-node": "^0.1.6",
+		"ts-node": "^10.9.1",
+		"typescript": "^5.1.3"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.17",
+		"@types/node": "^20.3.2"
+	}
 }
