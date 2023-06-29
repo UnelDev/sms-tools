@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { exec } from 'child_process';
 
 export default class sms {
@@ -20,7 +21,7 @@ export default class sms {
 		// Check if ADB is installed
 		exec('adb version', (error: any, stdout: any, stderr: any) => {
 			if (error || stderr) {
-				console.log("ADB is not installed. Please install Android Debug Bridge (ADB) to run this program.");
+				console.log('[' + chalk.red('sms error') + ']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' + stderr);
 				process.exit(1);
 			}
 
@@ -28,15 +29,14 @@ export default class sms {
 			exec('adb devices', (error, stdout) => {
 				const devices = stdout.split('\n').slice(1).filter(line => line.includes('device'));
 				if (devices.length === 0) {
-					console.log("No Android device is connected. Please connect a device to run this program.");
+					console.log('[' + chalk.red('sms error') + '] No Android device is connected. Please connect a device to run this program.');
 					process.exit(1);
 				}
 
 				// Send the SMS
 				exec(`adb shell "am start -a android.intent.action.SENDTO -d sms:${phoneNumber} --es sms_body \\"${message}\\" --ez exit_on_sent true"`, (error, stdout, stderr) => {
 					if (error || stderr) {
-						console.log({ error, stderr });
-						console.log("An error occurred while sending the SMS.");
+						console.log('[' + chalk.red('sms error') + '] An error occurred while sending the SMS: ' + stderr);
 						process.exit(1);
 					}
 
@@ -49,7 +49,7 @@ export default class sms {
 						// Tap the button at the specified position
 						exec(`adb shell input tap ${x} ${y}`, (error: any, stdout: any, stderr: any) => {
 							if (error || stderr) {
-								console.log("An error occurred while tapping the button.");
+								console.log('[' + chalk.red('sms error') + '] An error occurred while tapping the button: ' + stderr);
 								process.exit(1);
 							}
 							setTimeout(() => {

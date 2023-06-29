@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import { spawn } from 'child_process';
 export default class models {
 	message: string;
@@ -11,10 +12,10 @@ export default class models {
 		this.link = link;
 		this.childProcess = spawn('bash', [link], { shell: true });
 		this.childProcess.on('error', (error) => {
-			console.error(`error in llama: ${error}`);
+			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
 		this.childProcess.on('close', (code) => {
-			console.log(`llama close with code: ${code}`);
+			console.log('[' + chalk.red('model error') + '] llama close with code:' + code);
 		});
 
 		const outputStream = this.childProcess.stdout;
@@ -39,10 +40,10 @@ export default class models {
 		this.request = [];
 		this.childProcess = spawn('bash', [this.link], { shell: true });
 		this.childProcess.on('error', (error) => {
-			console.error(`error in llama: ${error}`);
+			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
 		this.childProcess.on('close', (code) => {
-			console.log(`llama close with code: ${code}`);
+			console.log('[' + chalk.red('model error') + '] llama close with code:' + code);
 		});
 
 		const outputStream = this.childProcess.stdout;

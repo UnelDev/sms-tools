@@ -1,7 +1,6 @@
 import fs from 'fs';
 
 function logConv(phoneNumber: string, question: string, answer: string) {
-	console.log({ phoneNumber, question, answer });
 	if (fs.existsSync('./datas/convSave.json')) {
 		const convArray: Array<[string, string, string]> = JSON.parse(fs.readFileSync('./datas/convSave.json')?.toString());
 		convArray.push([phoneNumber, question, answer]);
