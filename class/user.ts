@@ -1,5 +1,5 @@
-import llama from "../llama";
-import sms from "../smsSender";
+import llama from "./llama";
+import sms from "./smsSender";
 import fs from "fs";
 
 export default class user {
@@ -59,7 +59,6 @@ export default class user {
 
 	private firstMessageCheck(smsAPI: sms) {
 		if (!this.firstMessage) {
-			console.log(this);
 			this.firstMessage = true;
 			this.sendMessage('congratulations, you have send your first message, warning all data send by bob can be wrong. good disscution', smsAPI);
 		}

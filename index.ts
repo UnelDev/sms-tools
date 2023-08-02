@@ -1,10 +1,11 @@
 import chalk from 'chalk';
 import express from 'express';
 import { IsPhoneNumber } from './Utils';
-import restoreUsersFromFile from './class/restoreUser';
 import user from './class/user';
-import llama from './llama';
-import sms from './smsSender';
+import llama from './class/llama';
+import sms from './class/smsSender';
+import { restoreUsersFromFile, restoreadminFromFile } from './class/restore';
+import admin from './class/admin';
 
 function main() {
 	const smsAPI = new sms();
@@ -13,6 +14,7 @@ function main() {
 	const port = 5000;
 	const prefix = '!';
 	let userArray: Array<user> = restoreUsersFromFile();
+	let adminArray: Array<admin> = restoreadminFromFile();
 
 	app.listen(port, () => {
 		console.log('Listening on port ' + port);
@@ -25,7 +27,9 @@ function main() {
 
 		if (phoneNumber.startsWith('+33')) { phoneNumber = phoneNumber.replace('+33', '0') };
 
-		if (!IsPhoneNumber(phoneNumber)) { console.log(req.query); return; };
+		if (!IsPhoneNumber(phoneNumber)) {
+			console.log('[' + chalk.red('ERROR') + '] \'' + 'recevied message from: ' + chalk.bold(phoneNumber) + '\': ' + message);
+		};
 
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
