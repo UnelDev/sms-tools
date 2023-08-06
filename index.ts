@@ -6,11 +6,13 @@ import llama from './class/llama';
 import sms from './class/smsSender';
 import { restoreUsersFromFile, restoreadminFromFile } from './class/restore';
 import admin from './class/admin';
+import command from './command';
 
 function main() {
 	const smsAPI = new sms();
 	const llamaAPI = new llama('../llama.cpp/examples/myChat.sh')
 	const app = express();
+	app.use(express.json());
 	const port = 5000;
 	const prefix = '!';
 	let userArray: Array<user> = restoreUsersFromFile();
@@ -20,10 +22,10 @@ function main() {
 		console.log('Listening on port ' + port);
 	});
 
-	app.post('/', req => {
-		if (typeof req.query.message != 'string' || typeof req.query.contact != 'string') { return; };
-		let phoneNumber = req.query.contact;
-		let message = req.query.message;
+	app.post('/', (req: any) => {
+		if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') { return; };
+		let phoneNumber = req.body.contact;
+		let message = req.body.message;
 
 		if (phoneNumber.startsWith('+33')) { phoneNumber = phoneNumber.replace('+33', '0') };
 
@@ -34,6 +36,7 @@ function main() {
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
 			console.log('[' + chalk.yellow('COMMAND') + ']	\'' + chalk.bold(phoneNumber) + '\': ' + message);
+			command(message, phoneNumber, smsAPI, adminArray, userArray);
 		} else {
 			process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
 			let exist: boolean[] | undefined;

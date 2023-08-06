@@ -22,7 +22,7 @@ export default class sms {
 		exec('adb version', (error: any, stdout: any, stderr: any) => {
 			if (error || stderr) {
 				console.log('[' + chalk.red('sms error') + ']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' + stderr);
-				process.exit(1);
+				return;
 			}
 
 			// Check if an Android device is connected
@@ -30,14 +30,13 @@ export default class sms {
 				const devices = stdout.split('\n').slice(1).filter(line => line.includes('device'));
 				if (devices.length === 0) {
 					console.log('[' + chalk.red('sms error') + '] No Android device is connected. Please connect a device to run this program.');
-					process.exit(1);
 				}
 
 				// Send the SMS
 				exec(`adb shell "am start -a android.intent.action.SENDTO -d sms:${phoneNumber} --es sms_body \\"${message}\\" --ez exit_on_sent true"`, (error, stdout, stderr) => {
 					if (error || stderr) {
 						console.log('[' + chalk.red('sms error') + '] An error occurred while sending the SMS: ' + stderr);
-						process.exit(1);
+						return;
 					}
 
 					// Wait for 1 second
@@ -50,7 +49,7 @@ export default class sms {
 						exec(`adb shell input tap ${x} ${y}`, (error: any, stdout: any, stderr: any) => {
 							if (error || stderr) {
 								console.log('[' + chalk.red('sms error') + '] An error occurred while tapping the button: ' + stderr);
-								process.exit(1);
+								return;
 							}
 							setTimeout(() => {
 								exec('adb shell "am force-stop com.moez.QKSMS"');

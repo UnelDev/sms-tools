@@ -11,7 +11,7 @@ function IsPhoneNumber(number: any) {
 function isAdminPhoneNumber(adminArray: Array<admin>, phoneNumber: string): boolean {
 	let isAdmin = false;
 	adminArray.forEach((adminInstance) => {
-		if (adminInstance.phoneNumber === phoneNumber) {
+		if (adminInstance.phoneNumber == phoneNumber) {
 			isAdmin = true;
 		}
 	});
@@ -21,7 +21,7 @@ function isAdminPhoneNumber(adminArray: Array<admin>, phoneNumber: string): bool
 function isUserPhoneNumber(UserArray: Array<user>, phoneNumber: string): boolean {
 	let isUser = false;
 	UserArray.forEach((UserInstance) => {
-		if (UserInstance.phoneNumber === phoneNumber) {
+		if (UserInstance.phoneNumber == phoneNumber) {
 			isUser = true;
 		}
 	});
@@ -29,21 +29,23 @@ function isUserPhoneNumber(UserArray: Array<user>, phoneNumber: string): boolean
 }
 
 function getAdminByPhoneNumber(adminArray: Array<admin>, phoneNumber: string): admin | undefined {
+	let admin: admin | undefined = undefined;
 	adminArray.forEach((adminInstance) => {
-		if (adminInstance.phoneNumber === phoneNumber) {
-			return (adminInstance);
+		if (adminInstance.phoneNumber == phoneNumber) {
+			admin = adminInstance;
 		}
 	});
-	return (undefined);
+	return (admin);
 }
 
-function getUserByPhoneNumber(UserArray: Array<user>, phoneNumber: string): admin | undefined {
+function getUserByPhoneNumber(UserArray: Array<user>, phoneNumber: string): user | undefined {
+	let user: user | undefined = undefined;
 	UserArray.forEach((UserInstance) => {
-		if (UserInstance.phoneNumber === phoneNumber) {
-			return (UserInstance);
+		if (UserInstance.phoneNumber == phoneNumber) {
+			user = UserInstance;
 		}
 	});
-	return (undefined);
+	return (user);
 }
 
 export { IsPhoneNumber, isAdminPhoneNumber, isUserPhoneNumber, getAdminByPhoneNumber, getUserByPhoneNumber };

@@ -1,13 +1,22 @@
 import fs from "fs";
+import sms from "./smsSender";
 
 export default class admin {
 	phoneNumber: string;
+	actionHistory: Array<[Date, string]>
 	receviedHistory: Array<string>;
 	sendHistory: Array<string>;
 	constructor(phoneNumber: string) {
 		this.phoneNumber = phoneNumber;
 		this.receviedHistory = [];
 		this.sendHistory = [];
+		this.actionHistory = [];
+		this.save();
+	}
+
+	sendMessage(message: string, smsAPI: sms) {
+		this.sendHistory.push(message);
+		smsAPI.sendSms(this.phoneNumber, message);
 		this.save();
 	}
 
