@@ -15,6 +15,8 @@ export default function command(message: string, phoneNumber: string, smsAPI: sm
 		} else if (command[0] == 'unban') {
 			unbanUser(phoneNumber, command, smsAPI, adminArray, userArray);
 			responding = true;
+		} else if (command[0] == 'restart') {
+			restart(phoneNumber, llamaAPI, smsAPI);
 		}
 	}
 
@@ -106,4 +108,9 @@ function ping(phoneNumber: string, llamaAPI: llama, smsAPI: sms, adminArray: Arr
 			smsAPI.sendSms(phoneNumber, 'The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's');
 		}
 	});
+}
+
+function restart(phoneNumber: string, llamaAPI: llama, smsAPI: sms) {
+	smsAPI.sendSms(phoneNumber, 'Restarting system...');
+	llamaAPI.restart();
 }
