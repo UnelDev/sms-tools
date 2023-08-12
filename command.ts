@@ -1,19 +1,43 @@
 import { getAdminByPhoneNumber, getUserByPhoneNumber, isAdminPhoneNumber, isUserPhoneNumber } from "./Utils";
 import admin from "./class/admin";
+import llama from "./class/llama";
 import sms from "./class/smsSender";
 import user from "./class/user";
 
-export default function command(message: string, phoneNumber: string, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
+export default function command(message: string, phoneNumber: string, smsAPI: sms, llamaAPI: llama, adminArray: Array<admin>, userArray: Array<user>) {
 	message.trim();
 	const command = message.split(' ');
+	let responding = false;
 	if (isAdminPhoneNumber(adminArray, phoneNumber)) {
 		if (command[0] == 'ban') {
 			banUser(phoneNumber, command, smsAPI, adminArray, userArray);
+			responding = true;
 		} else if (command[0] == 'unban') {
 			unbanUser(phoneNumber, command, smsAPI, adminArray, userArray);
+			responding = true;
 		}
-	} else if (isUserPhoneNumber(userArray, phoneNumber)) {
+	}
 
+	if (isUserPhoneNumber(userArray, phoneNumber)) {
+		if (command[0] == 'ping') {
+			ping(phoneNumber, llamaAPI, smsAPI, adminArray, userArray);
+			responding = true;
+		}
+	}
+	if (!responding) {
+		commandNotFond(phoneNumber, smsAPI, adminArray, userArray);
+	}
+}
+
+function commandNotFond(phoneNumber: string, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
+	const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
+	if (typeof admin != "undefined") {
+		admin.sendMessage('Unknown command', smsAPI);
+	} else if (typeof user != "undefined") {
+		const user = getUserByPhoneNumber(userArray, command[1]);
+		user.sendMessage('Unknown command', smsAPI);
+	} else {
+		smsAPI.sendSms(phoneNumber, 'Unknown command');
 	}
 }
 
@@ -65,4 +89,21 @@ function unbanUser(phoneNumber: string, command: string[], smsAPI: sms, adminArr
 	user.save();
 	user.sendMessage("You have been unbaned by an administrator", smsAPI);
 	admin.sendMessage("User " + user.phoneNumber + " has be unbanish", smsAPI);
+}
+
+function ping(phoneNumber: string, llamaAPI: llama, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
+	const start = Date.now();
+	new Promise(resolve => {
+		llamaAPI.send('What\'s your name?', resolve);
+	}).then(() => {
+		const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
+		if (typeof admin != "undefined") {
+			admin.sendMessage('The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's', smsAPI);
+		} else if (typeof user != "undefined") {
+			const user = getUserByPhoneNumber(userArray, command[1]);
+			user.sendMessage('The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's', smsAPI);
+		} else {
+			smsAPI.sendSms(phoneNumber, 'The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's');
+		}
+	});
 }

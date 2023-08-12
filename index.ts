@@ -36,7 +36,7 @@ function main() {
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
 			console.log('[' + chalk.yellow('COMMAND') + ']	\'' + chalk.bold(phoneNumber) + '\': ' + message);
-			command(message, phoneNumber, smsAPI, adminArray, userArray);
+			command(message, phoneNumber, smsAPI, llamaAPI, adminArray, userArray);
 		} else {
 			process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
 			let exist: boolean[] | undefined;
