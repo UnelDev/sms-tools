@@ -9,6 +9,8 @@ export default function command(message: string, phoneNumber: string, smsAPI: sm
 	if (isAdminPhoneNumber(adminArray, phoneNumber)) {
 		if (command[0] == 'ban') {
 			banUser(phoneNumber, command, smsAPI, adminArray, userArray);
+		} else if (command[0] == 'unban') {
+			unbanUser(phoneNumber, command, smsAPI, adminArray, userArray);
 		}
 	} else if (isUserPhoneNumber(userArray, phoneNumber)) {
 
@@ -40,4 +42,27 @@ function banUser(phoneNumber: string, command: string[], smsAPI: sms, adminArray
 	user.save();
 	user.sendMessage("You have been baned by an administrator until " + user.banished.toLocaleString('fr-FR', { timeZone: 'UTC' }), smsAPI);
 	admin.sendMessage("User " + user.phoneNumber + " has be banish", smsAPI);
+}
+
+function unbanUser(phoneNumber: string, command: string[], smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
+	if (command.length != 2) {
+		smsAPI.sendSms(phoneNumber, 'Syntax: unban <number>');
+		return;
+	}
+	const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
+	if (typeof admin == "undefined") {
+		smsAPI.sendSms(phoneNumber, "Error in finding admin");
+		return;
+	}
+	if (!isUserPhoneNumber(userArray, command[1])) {
+		admin.sendMessage('No link between a user and this phone number', smsAPI);
+		return;
+	}
+	admin.actionHistory.push([new Date(), command.join(' ')]);
+	admin.save();
+	const user = getUserByPhoneNumber(userArray, command[1]);
+	user.banished = new Date(0);
+	user.save();
+	user.sendMessage("You have been unbaned by an administrator", smsAPI);
+	admin.sendMessage("User " + user.phoneNumber + " has be unbanish", smsAPI);
 }
