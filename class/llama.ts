@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { spawn } from 'child_process';
-export default class models {
+export default class llama {
 	message: string;
 	childProcess: import("child_process").ChildProcessWithoutNullStreams;
 	computing: boolean;
