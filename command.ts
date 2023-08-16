@@ -17,6 +17,7 @@ export default function command(message: string, phoneNumber: string, req: any, 
 			responding = true;
 		} else if (command[0] == 'restart') {
 			restart(phoneNumber, llamaAPI, smsAPI);
+			responding = true;
 		}
 	}
 
