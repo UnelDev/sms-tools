@@ -10,6 +10,7 @@ import command from './command';
 
 function main() {
 	const smsAPI = new sms();
+	if (!smsAPI) { return; }
 	const llamaAPI = new llama('../llama.cpp/examples/myChat.sh')
 	const app = express();
 	app.use(express.json());
@@ -22,7 +23,7 @@ function main() {
 		console.log('Listening on port ' + port);
 	});
 
-	app.post('/', (req: any) => {
+	app.post('/', (req, res) => {
 		if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') { console.log('bad body'); return; };
 		let phoneNumber = req.body.contact;
 		let message = req.body.message;
@@ -49,6 +50,7 @@ function main() {
 				userArray = restoreUsersFromFile();
 			}
 		}
+		res.status(200);
 	});
 }
 

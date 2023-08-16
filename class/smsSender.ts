@@ -7,7 +7,21 @@ export default class sms {
 	constructor() {
 		this.processing = false;
 		this.sendingList = [];
+		exec('adb version', (error: any, stdout: any, stderr: any) => {
+			if (error || stderr) {
+				console.log('[' + chalk.red('sms error') + ']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' + stderr);
+				return (false);
+			}
+			exec('adb devices', (error, stdout) => {
+				const devices = stdout.split('\n').slice(1).filter(line => line.includes('device'));
+				if (devices.length === 0) {
+					console.log('[' + chalk.red('sms error') + '] No Android device is connected. Please connect a device to run this program.');
+					return (false);
+				}
+			});
+		});
 	}
+
 	sendSms(phoneNumber: string, message: string) {
 		this.sendingList.push([phoneNumber, message]);
 		this.sendinAdb();
