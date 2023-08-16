@@ -23,7 +23,7 @@ function main() {
 	});
 
 	app.post('/', (req: any) => {
-		if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') { return; };
+		if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') { console.log('bad body'); return; };
 		let phoneNumber = req.body.contact;
 		let message = req.body.message;
 
@@ -36,7 +36,7 @@ function main() {
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
 			console.log('[' + chalk.yellow('COMMAND') + ']	\'' + chalk.bold(phoneNumber) + '\': ' + message);
-			command(message, phoneNumber, smsAPI, llamaAPI, adminArray, userArray);
+			command(message, phoneNumber, req, smsAPI, llamaAPI, adminArray, userArray);
 		} else {
 			process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
 			let exist: boolean[] | undefined;

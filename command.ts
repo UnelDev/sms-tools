@@ -4,7 +4,7 @@ import llama from "./class/llama";
 import sms from "./class/smsSender";
 import user from "./class/user";
 
-export default function command(message: string, phoneNumber: string, smsAPI: sms, llamaAPI: llama, adminArray: Array<admin>, userArray: Array<user>) {
+export default function command(message: string, phoneNumber: string, req: any, smsAPI: sms, llamaAPI: llama, adminArray: Array<admin>, userArray: Array<user>) {
 	message.trim();
 	const command = message.split(' ');
 	let responding = false;
@@ -22,7 +22,7 @@ export default function command(message: string, phoneNumber: string, smsAPI: sm
 
 	if (isUserPhoneNumber(userArray, phoneNumber)) {
 		if (command[0] == 'ping') {
-			ping(phoneNumber, llamaAPI, smsAPI, adminArray, userArray);
+			ping(phoneNumber, req, llamaAPI, smsAPI, adminArray, userArray);
 			responding = true;
 		}
 	}
@@ -93,14 +93,16 @@ function unbanUser(phoneNumber: string, command: string[], smsAPI: sms, adminArr
 	admin.sendMessage("User " + user.phoneNumber + " has be unbanish", smsAPI);
 }
 
-function ping(phoneNumber: string, llamaAPI: llama, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
+function ping(phoneNumber: string, req: any, llamaAPI: llama, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
 	const start = Date.now();
 	new Promise(resolve => {
 		llamaAPI.send('What\'s your name?', resolve);
 	}).then(() => {
 		const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
 		if (typeof admin != "undefined") {
-			admin.sendMessage('The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's', smsAPI);
+			admin.sendMessage('The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + `s.
+the SMS ping (from sending to receiving) is of `+ req.body.pingSms.replace('.0', '') + `s.
+Total: `+ (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now() - start) / 1000).toFixed(1))) + 's.', smsAPI);
 		} else if (typeof user != "undefined") {
 			const user = getUserByPhoneNumber(userArray, command[1]);
 			user.sendMessage('The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's', smsAPI);
