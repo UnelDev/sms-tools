@@ -39,6 +39,7 @@ export default class user {
 
 		llamaAPI.send(message, answer => {
 			this.sendMessage(answer, smsAPI);
+			console.log('[' + chalk.green('LLama response') + '] \'' + answer);
 		});
 		return (true);
 	}

@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { getAdminByPhoneNumber, getUserByPhoneNumber, isAdminPhoneNumber, isUserPhoneNumber } from "./Utils";
 import admin from "./class/admin";
 import llama from "./class/llama";
@@ -69,6 +70,7 @@ function banUser(phoneNumber: string, command: string[], smsAPI: sms, adminArray
 	user.save();
 	user.sendMessage("You have been baned by an administrator until " + user.banished.toLocaleString('fr-FR', { timeZone: 'UTC' }), smsAPI);
 	admin.sendMessage("User " + user.phoneNumber + " has be banish", smsAPI);
+	console.log('[' + chalk.green('sucess command') + '] User ' + user.phoneNumber + " has be banish");
 }
 
 function unbanUser(phoneNumber: string, command: string[], smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
@@ -92,6 +94,7 @@ function unbanUser(phoneNumber: string, command: string[], smsAPI: sms, adminArr
 	user.save();
 	user.sendMessage("You have been unbaned by an administrator", smsAPI);
 	admin.sendMessage("User " + user.phoneNumber + " has be unbanish", smsAPI);
+	console.log('[' + chalk.green('sucess command') + '] User' + user.phoneNumber + " has be unbanish");
 }
 
 function ping(phoneNumber: string, req: any, llamaAPI: llama, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
@@ -110,10 +113,12 @@ Total: `+ (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now(
 		} else {
 			smsAPI.sendSms(phoneNumber, 'The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's');
 		}
+		console.log('[' + chalk.green('sucess command') + '] ping : sms [' + req.body.pingSms.replace('.0', '') + 's] llama [' + ((Date.now() - start) / 1000).toFixed(1) + 's] total = ' + (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now() - start) / 1000).toFixed(1))) + 's.');
 	});
 }
 
 function restart(phoneNumber: string, llamaAPI: llama, smsAPI: sms) {
+	console.log('[' + chalk.green('sucess command') + '] Restarting system...');
 	smsAPI.sendSms(phoneNumber, 'Restarting system...');
 	llamaAPI.restart();
 }
