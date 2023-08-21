@@ -24,6 +24,7 @@ function main() {
 	});
 
 	app.post('/', (req, res) => {
+		res.status(200);
 		if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') { console.log('bad body'); return; };
 		let phoneNumber = req.body.contact;
 		let message = req.body.message;
@@ -50,7 +51,6 @@ function main() {
 				userArray = restoreUsersFromFile();
 			}
 		}
-		res.status(200);
 	});
 }
 
