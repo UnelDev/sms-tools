@@ -48,4 +48,25 @@ function getUserByPhoneNumber(UserArray: Array<user>, phoneNumber: string): user
 	return (user);
 }
 
-export { IsPhoneNumber, isAdminPhoneNumber, isUserPhoneNumber, getAdminByPhoneNumber, getUserByPhoneNumber };
+function removeEmoji(str: string) {
+	if (!str) {
+		return '';
+	}
+	return str.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+}
+
+function removeAll(str: string, remplace: string) {
+	while (str.includes(remplace)) {
+		str = str.replace(remplace, '');
+	}
+	return str;
+}
+export {
+	IsPhoneNumber,
+	isAdminPhoneNumber,
+	isUserPhoneNumber,
+	getAdminByPhoneNumber,
+	getUserByPhoneNumber,
+	removeEmoji,
+	removeAll
+};

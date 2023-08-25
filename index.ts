@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import express from 'express';
-import { IsPhoneNumber } from './Utils';
+import { IsPhoneNumber, removeEmoji, removeAll } from './Utils';
 import user from './class/user';
 import llama from './class/llama';
 import sms from './class/smsSender';
@@ -19,15 +19,20 @@ function main() {
 	let userArray: Array<user> = restoreUsersFromFile();
 	let adminArray: Array<admin> = restoreadminFromFile();
 
+
 	app.listen(port, () => {
 		console.log('Listening on port ' + port);
 	});
 
 	app.post('/', (req, res) => {
-		res.status(200);
 		if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') { console.log('bad body'); return; };
 		let phoneNumber = req.body.contact;
-		let message = req.body.message;
+		let message: string = req.body.message;
+		res.status(200);
+
+		message = removeAll(message, '\n')
+		message = removeEmoji(message);
+		message.trim();
 
 		if (phoneNumber.startsWith('+33')) { phoneNumber = phoneNumber.replace('+33', '0') };
 

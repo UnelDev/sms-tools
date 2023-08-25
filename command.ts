@@ -1,12 +1,11 @@
 import chalk from "chalk";
-import { getAdminByPhoneNumber, getUserByPhoneNumber, isAdminPhoneNumber, isUserPhoneNumber } from "./Utils";
+import { getAdminByPhoneNumber, getUserByPhoneNumber, isAdminPhoneNumber, isUserPhoneNumber, removeEmoji } from "./Utils";
 import admin from "./class/admin";
 import llama from "./class/llama";
 import sms from "./class/smsSender";
 import user from "./class/user";
 
 export default function command(message: string, phoneNumber: string, req: any, smsAPI: sms, llamaAPI: llama, adminArray: Array<admin>, userArray: Array<user>) {
-	message.trim();
 	const command = message.split(' ');
 	let responding = false;
 	if (isAdminPhoneNumber(adminArray, phoneNumber)) {
@@ -108,8 +107,14 @@ function ping(phoneNumber: string, req: any, llamaAPI: llama, smsAPI: sms, admin
 the SMS ping (from sending to receiving) is of `+ req.body.pingSms.replace('.0', '') + `s.
 Total: `+ (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now() - start) / 1000).toFixed(1))) + 's.', smsAPI);
 		} else if (typeof user != "undefined") {
-			const user = getUserByPhoneNumber(userArray, command[1]);
-			user.sendMessage('The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's', smsAPI);
+			const user = getUserByPhoneNumber(userArray, phoneNumber);
+			if (user) {
+				user.sendMessage('The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + `s.
+the SMS ping (from sending to receiving) is of `+ req.body.pingSms.replace('.0', '') + `s.
+Total: `+ (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now() - start) / 1000).toFixed(1))) + 's.', smsAPI);
+			} else {
+				console.log('[' + chalk.red('Error') + '] no user found : ' + phoneNumber);
+			}
 		} else {
 			smsAPI.sendSms(phoneNumber, 'The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's');
 		}

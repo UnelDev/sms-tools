@@ -32,14 +32,13 @@ export default class user {
 			return (true);
 		}
 		if (message.replace('\n', '').replace(' ', '') == '') { return (false) };
-		message.trim();
 		this.firstMessageCheck(smsAPI);
 		this.receviedHistory.push(message);
 		this.save();
 
 		llamaAPI.send(message, answer => {
 			this.sendMessage(answer, smsAPI);
-			console.log('[' + chalk.green('LLama response') + '] \'' + answer);
+			console.log('[' + chalk.green('LLama response') + '] \'' + answer + '\'');
 		});
 		return (true);
 	}
