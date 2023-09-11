@@ -5,7 +5,7 @@ import admin from "./admin";
 function restoreUsersFromFile(): Array<user> {
 	if (fs.existsSync("./datas/UserSave.json")) {
 		const userData: user[] = JSON.parse(
-			fs.readFileSync("./datas/UserSave.json")?.toString()
+			fs.readFileSync("./datas/UserSave.json")?.toString() ?? '[]'
 		);
 
 		return userData.map((userData) => {
@@ -23,7 +23,7 @@ function restoreUsersFromFile(): Array<user> {
 function restoreadminFromFile(): Array<admin> {
 	if (fs.existsSync("./datas/adminSave.json")) {
 		const adminData: admin[] = JSON.parse(
-			fs.readFileSync("./datas/adminSave.json")?.toString()
+			fs.readFileSync("./datas/adminSave.json")?.toString() ?? '[]'
 		);
 
 		return adminData.map((adminData) => {
