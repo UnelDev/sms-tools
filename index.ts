@@ -8,10 +8,12 @@ import { restoreUsersFromFile, restoreadminFromFile } from './class/restore';
 import admin from './class/admin';
 import command from './command';
 
-function main() {
+async function main() {
 	const smsAPI = new sms();
 	if (!smsAPI) { return; }
-	const llamaAPI = new llama('../llama.cpp/examples/myChat.sh')
+	const llamaAPI = new Promise(resolve => {
+		new llama('../llama.cpp/examples/myChat.sh', resolve);
+	}) as unknown as llama;
 	const app = express();
 	app.use(express.json());
 	const port = 5000;
@@ -19,12 +21,14 @@ function main() {
 	let userArray: Array<user> = restoreUsersFromFile();
 	let adminArray: Array<admin> = restoreadminFromFile();
 
+	await llamaAPI;
+
 
 	app.listen(port, () => {
 		console.log('Listening on port ' + port);
 	});
 
-	app.post('/', (req, res) => {
+	app.post('/', async (req, res) => {
 		if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') { console.log('bad body'); return; };
 		let phoneNumber = req.body.contact;
 		let message: string = req.body.message;
