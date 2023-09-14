@@ -65,9 +65,9 @@ function banUser(phoneNumber: string, command: string[], smsAPI: sms, adminArray
 		smsAPI.sendSms(phoneNumber, 'Duration is not a number, syntax: ban <number> [duration]');
 		return;
 	}
-	user.banished = new Date(command[2] ? Date.now() + (parseInt(command[2]) * 1000) : 8640000000000000);
+	user.isBan = new Date(command[2] ? Date.now() + (parseInt(command[2]) * 1000) : 8640000000000000);
 	user.save();
-	user.sendMessage("You have been baned by an administrator until " + user.banished.toLocaleString('fr-FR', { timeZone: 'UTC' }), smsAPI);
+	user.sendMessage("You have been baned by an administrator until " + user.isBan.toLocaleString('fr-FR', { timeZone: 'UTC' }), smsAPI);
 	admin.sendMessage("User " + user.phoneNumber + " has be banish", smsAPI);
 	console.log('[' + chalk.green('sucess command') + '] User ' + user.phoneNumber + " has be banish");
 }
@@ -89,7 +89,7 @@ function unbanUser(phoneNumber: string, command: string[], smsAPI: sms, adminArr
 	admin.actionHistory.push([new Date(), command.join(' ')]);
 	admin.save();
 	const user = getUserByPhoneNumber(userArray, command[1]);
-	user.banished = new Date(0);
+	user.isBan = new Date(0);
 	user.save();
 	user.sendMessage("You have been unbaned by an administrator", smsAPI);
 	admin.sendMessage("User " + user.phoneNumber + " has be unbanish", smsAPI);
