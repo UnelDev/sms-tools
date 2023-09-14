@@ -125,5 +125,5 @@ Total: `+ (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now(
 function restart(phoneNumber: string, llamaAPI: llama, smsAPI: sms) {
 	console.log('[' + chalk.green('sucess command') + '] Restarting system...');
 	smsAPI.sendSms(phoneNumber, 'Restarting system...');
-	llamaAPI.restart();
+	llamaAPI.restart(() => smsAPI.sendSms(phoneNumber, 'restart completed'));
 }

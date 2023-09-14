@@ -40,7 +40,7 @@ export default class llama {
 		}
 	}
 
-	restart() {
+	restart(onStart: Function) {
 		this.message = '';
 		this.computing = false;
 		this.request = [];
@@ -56,7 +56,9 @@ export default class llama {
 		outputStream.on('data', (data) => {
 			this.awnser(data);
 		});
-
+		this.onStart = onStart;
+		this.started = false;
+		this.send('Please tell me the largest city in Europe.', () => null);
 	}
 
 	private compute() {
