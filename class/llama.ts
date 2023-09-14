@@ -70,8 +70,8 @@ export default class llama {
 
 	private awnser(data: any) {
 		this.message += data.toString();
+		const ArrayOfMessage = this.message.split('\n');
 		if (!this.started) {
-			const ArrayOfMessage = this.message.split('\n');
 			if (ArrayOfMessage.length >= 7 && ((ArrayOfMessage[7] ?? "").includes('User:'))) {
 				this.started = true;
 				this.onStart();
@@ -79,7 +79,6 @@ export default class llama {
 		}
 		if (!this.computing) return;
 		if (this.message.endsWith('User:')) {
-			const ArrayOfMessage = this.message.split('\n')
 			if (ArrayOfMessage.length < 2) { console.log('error'); }
 			const readeableMessage = ArrayOfMessage[ArrayOfMessage.length - 2].replace('User:Bob: ', '').replace('Bob:', '').replace('User:', '');
 			this.request[0][1](readeableMessage);

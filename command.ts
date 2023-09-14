@@ -36,11 +36,13 @@ function commandNotFond(phoneNumber: string, smsAPI: sms, adminArray: Array<admi
 	const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
 	if (typeof admin != "undefined") {
 		admin.sendMessage('Unknown command', smsAPI);
-	} else if (typeof user != "undefined") {
-		const user = getUserByPhoneNumber(userArray, command[1]);
-		user.sendMessage('Unknown command', smsAPI);
 	} else {
-		smsAPI.sendSms(phoneNumber, 'Unknown command');
+		const user = getUserByPhoneNumber(userArray, command[1]);
+		if (typeof user != "undefined") {
+			user.sendMessage('Unknown command', smsAPI);
+		} else {
+			smsAPI.sendSms(phoneNumber, 'Unknown command');
+		}
 	}
 }
 
