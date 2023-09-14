@@ -8,13 +8,13 @@ export default class user {
 	firstMessage: boolean;
 	receviedHistory: Array<string>;
 	sendHistory: Array<string>;
-	banished: Date;
+	isBan: Date;
 	constructor(phoneNumber: string) {
 		this.phoneNumber = phoneNumber;
 		this.firstMessage = false;
 		this.receviedHistory = [];
 		this.sendHistory = [];
-		this.banished = new Date(0);
+		this.isBan = new Date(0);
 		this.save();
 	}
 
@@ -27,7 +27,7 @@ export default class user {
 
 	newMessage(phoneNumber: string, message: string, smsAPI: sms, llamaAPI: llama): boolean {
 		if (phoneNumber != this.phoneNumber) { return (false) };
-		if (this.banished > new Date()) {
+		if (this.isBan > new Date()) {
 			console.log(chalk.red("from baned user") + ": " + message);
 			return (true);
 		}
@@ -37,8 +37,8 @@ export default class user {
 		this.save();
 
 		llamaAPI.send(message, answer => {
-			this.sendMessage(answer, smsAPI);
 			console.log('[' + chalk.green('LLama response') + '] \'' + answer + '\'');
+			this.sendMessage(answer, smsAPI);
 		});
 		return (true);
 	}

@@ -13,6 +13,7 @@ function restoreUsersFromFile(): Array<user> {
 			restoredUser.firstMessage = userData.firstMessage;
 			restoredUser.receviedHistory = userData.receviedHistory;
 			restoredUser.sendHistory = userData.sendHistory;
+			restoredUser.isBan = userData.isBan;
 			return restoredUser;
 		});
 	}
