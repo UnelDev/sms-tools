@@ -11,9 +11,9 @@ import command from './command';
 async function main() {
 	const smsAPI = new sms();
 	if (!smsAPI) { return; }
-	const llamaAPI = new Promise(resolve => {
-		new llama('../llama.cpp/examples/myChat.sh', resolve);
-	}) as unknown as llama;
+	const llamaAPI = await new Promise<llama>(resolve => {
+		const l = new llama('../llama.cpp/examples/myChat.sh', () => resolve(l));
+	});
 	const app = express();
 	app.use(express.json());
 	const port = 5000;
