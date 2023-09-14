@@ -9,8 +9,11 @@ import admin from './class/admin';
 import command from './command';
 
 async function main() {
+	console.log('starting...');
 	const smsAPI = new sms();
 	if (!smsAPI) { return; }
+	let userArray: Array<user> = restoreUsersFromFile();
+	let adminArray: Array<admin> = restoreadminFromFile();
 	const llamaAPI = await new Promise<llama>(resolve => {
 		const l = new llama('../llama.cpp/examples/myChat.sh', () => resolve(l));
 	});
@@ -18,10 +21,6 @@ async function main() {
 	app.use(express.json());
 	const port = 5000;
 	const prefix = '!';
-	let userArray: Array<user> = restoreUsersFromFile();
-	let adminArray: Array<admin> = restoreadminFromFile();
-
-	await llamaAPI;
 
 
 	app.listen(port, () => {

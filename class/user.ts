@@ -9,12 +9,12 @@ export default class user {
 	receviedHistory: Array<string>;
 	sendHistory: Array<string>;
 	isBan: Date;
-	constructor(phoneNumber: string) {
+	constructor(phoneNumber: string, firstMessage = false, receviedHistory = [], sendHistory = [], isBan = new Date(0)) {
 		this.phoneNumber = phoneNumber;
-		this.firstMessage = false;
-		this.receviedHistory = [];
-		this.sendHistory = [];
-		this.isBan = new Date(0);
+		this.firstMessage = firstMessage;
+		this.receviedHistory = receviedHistory;
+		this.sendHistory = sendHistory;
+		this.isBan = isBan;
 		this.save();
 	}
 
@@ -67,6 +67,7 @@ export default class user {
 	private firstMessageCheck(smsAPI: sms) {
 		if (!this.firstMessage) {
 			this.firstMessage = true;
+			this.save();
 			this.sendMessage('congratulations, you have send your first message, warning all data send by bob can be wrong. good disscution', smsAPI);
 		}
 	}

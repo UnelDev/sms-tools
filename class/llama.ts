@@ -72,7 +72,7 @@ export default class llama {
 		this.message += data.toString();
 		if (!this.started) {
 			const ArrayOfMessage = this.message.split('\n');
-			if (ArrayOfMessage.length >= 7 && ArrayOfMessage[7] == 'User:') {
+			if (ArrayOfMessage.length >= 7 && ((ArrayOfMessage[7] ?? "").includes('User:'))) {
 				this.started = true;
 				this.onStart();
 			}
@@ -81,7 +81,7 @@ export default class llama {
 		if (this.message.endsWith('User:')) {
 			const ArrayOfMessage = this.message.split('\n')
 			if (ArrayOfMessage.length < 2) { console.log('error'); }
-			const readeableMessage = ArrayOfMessage[ArrayOfMessage.length - 2].replace('User:Bob: ', '').replace('Bob:', '');
+			const readeableMessage = ArrayOfMessage[ArrayOfMessage.length - 2].replace('User:Bob: ', '').replace('Bob:', '').replace('User:', '');
 			this.request[0][1](readeableMessage);
 			this.request.shift();
 			if (this.request.length == 0) this.computing = false;

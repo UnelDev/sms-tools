@@ -6,11 +6,11 @@ export default class admin {
 	actionHistory: Array<[Date, string]>
 	receviedHistory: Array<string>;
 	sendHistory: Array<string>;
-	constructor(phoneNumber: string) {
+	constructor(phoneNumber: string, receviedHistory = [], sendHistory = [], actionHistory = []) {
 		this.phoneNumber = phoneNumber;
-		this.receviedHistory = [];
-		this.sendHistory = [];
-		this.actionHistory = [];
+		this.receviedHistory = receviedHistory;
+		this.sendHistory = sendHistory;
+		this.actionHistory = actionHistory;
 		this.save();
 	}
 
@@ -23,8 +23,8 @@ export default class admin {
 	async save() {
 		try {
 			let adminArray: Array<admin> = [];
-			if (fs.existsSync('./datas/adminSave.json')) {
-				adminArray = JSON.parse(fs.readFileSync('./datas/adminSave.json').toString());
+			if (fs.existsSync('./datas/Adminsave.json')) {
+				adminArray = JSON.parse(fs.readFileSync('./datas/Adminsave.json').toString());
 				const index = adminArray.findIndex((u) => u.phoneNumber === this.phoneNumber);
 				if (index !== -1) {
 					adminArray[index] = this;
@@ -34,7 +34,7 @@ export default class admin {
 			} else {
 				adminArray.push(this);
 			}
-			fs.writeFileSync('./datas/adminSave.json', JSON.stringify(adminArray));
+			fs.writeFileSync('./datas/Adminsave.json', JSON.stringify(adminArray));
 		} catch (err) {
 			console.error('Error while saving admin:', err);
 		}

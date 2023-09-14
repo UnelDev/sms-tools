@@ -7,13 +7,12 @@ function restoreUsersFromFile(): Array<user> {
 		const userData: user[] = JSON.parse(
 			fs.readFileSync("./datas/UserSave.json")?.toString() ?? '[]'
 		);
-
 		return userData.map((userData) => {
-			const restoredUser = new user(userData.phoneNumber);
-			restoredUser.firstMessage = userData.firstMessage;
-			restoredUser.receviedHistory = userData.receviedHistory;
-			restoredUser.sendHistory = userData.sendHistory;
-			restoredUser.isBan = userData.isBan;
+			const restoredUser = new user(userData.phoneNumber,
+				userData.firstMessage,
+				userData.receviedHistory,
+				userData.sendHistory,
+				userData.isBan);
 			return restoredUser;
 		});
 	}
@@ -22,9 +21,9 @@ function restoreUsersFromFile(): Array<user> {
 }
 
 function restoreadminFromFile(): Array<admin> {
-	if (fs.existsSync("./datas/adminSave.json")) {
+	if (fs.existsSync("./datas/Adminsave.json")) {
 		const adminData: admin[] = JSON.parse(
-			fs.readFileSync("./datas/adminSave.json")?.toString() ?? '[]'
+			fs.readFileSync("./datas/Adminsave.json")?.toString() ?? '[]'
 		);
 
 		return adminData.map((adminData) => {
