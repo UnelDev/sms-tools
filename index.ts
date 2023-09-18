@@ -17,6 +17,7 @@ async function main() {
 	const llamaAPI = await new Promise<llama>(resolve => {
 		const l = new llama('../llama.cpp/examples/myChat.sh', () => resolve(l));
 	});
+	console.log('Llama started!');
 	const app = express();
 	app.use(express.json());
 	const port = 5000;
@@ -45,7 +46,7 @@ async function main() {
 
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
-			console.log('[' + chalk.yellow('COMMAND') + ']	\'' + chalk.bold(phoneNumber) + '\': ' + message);
+			console.log('[' + chalk.yellow('COMMAND') + '] \'' + chalk.bold(phoneNumber) + '\': ' + message);
 			command(message, phoneNumber, req, smsAPI, llamaAPI, adminArray, userArray);
 		} else {
 			process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');

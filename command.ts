@@ -71,7 +71,7 @@ function banUser(phoneNumber: string, command: string[], smsAPI: sms, adminArray
 	user.save();
 	user.sendMessage("You have been baned by an administrator until " + user.isBan.toLocaleString('fr-FR', { timeZone: 'UTC' }), smsAPI);
 	admin.sendMessage("User " + user.phoneNumber + " has be banish", smsAPI);
-	console.log('[' + chalk.green('sucess command') + '] User ' + user.phoneNumber + " has be banish");
+	console.log('[' + chalk.green('success command') + '] User ' + user.phoneNumber + " has be banish");
 }
 
 function unbanUser(phoneNumber: string, command: string[], smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
@@ -95,7 +95,7 @@ function unbanUser(phoneNumber: string, command: string[], smsAPI: sms, adminArr
 	user.save();
 	user.sendMessage("You have been unbaned by an administrator", smsAPI);
 	admin.sendMessage("User " + user.phoneNumber + " has be unbanish", smsAPI);
-	console.log('[' + chalk.green('sucess command') + '] User' + user.phoneNumber + " has be unbanish");
+	console.log('[' + chalk.green('success command') + '] User' + user.phoneNumber + " has be unbanish");
 }
 
 function ping(phoneNumber: string, req: any, llamaAPI: llama, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
@@ -120,12 +120,15 @@ Total: `+ (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now(
 		} else {
 			smsAPI.sendSms(phoneNumber, 'The model respond in ' + ((Date.now() - start) / 1000).toFixed(1) + 's');
 		}
-		console.log('[' + chalk.green('sucess command') + '] ping : sms [' + req.body.pingSms.replace('.0', '') + 's] llama [' + ((Date.now() - start) / 1000).toFixed(1) + 's] total = ' + (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now() - start) / 1000).toFixed(1))) + 's.');
+		console.log('[' + chalk.green('success command') + '] ping : sms [' + req.body.pingSms.replace('.0', '') + 's] llama [' + ((Date.now() - start) / 1000).toFixed(1) + 's] total = ' + (parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now() - start) / 1000).toFixed(1))) + 's.');
 	});
 }
 
 function restart(phoneNumber: string, llamaAPI: llama, smsAPI: sms) {
-	console.log('[' + chalk.green('sucess command') + '] Restarting system...');
+	console.log('[' + chalk.green('success command') + '] Restarting system...');
 	smsAPI.sendSms(phoneNumber, 'Restarting system...');
-	llamaAPI.restart(() => smsAPI.sendSms(phoneNumber, 'restart completed'));
+	llamaAPI.restart(() => {
+		smsAPI.sendSms(phoneNumber, 'restart completed');
+		console.log('[' + chalk.green('success command') + '] System restarted!');
+	});
 }
