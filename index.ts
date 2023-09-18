@@ -47,7 +47,7 @@ async function main() {
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
 			console.log('[' + chalk.yellow('COMMAND') + '] \'' + chalk.bold(phoneNumber) + '\': ' + message);
-			command(message, phoneNumber, req, smsAPI, llamaAPI, adminArray, userArray);
+			command(message, phoneNumber, req, Date.now(), smsAPI, llamaAPI, adminArray, userArray);
 		} else {
 			process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
 			let exist: boolean[] | undefined;
