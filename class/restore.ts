@@ -21,11 +21,10 @@ function restoreUsersFromFile(): Array<user> {
 }
 
 function restoreadminFromFile(): Array<admin> {
-	if (fs.existsSync("./datas/Adminsave.json")) {
+	if (fs.existsSync("./datas/AdminSave.json")) {
 		const adminData: admin[] = JSON.parse(
-			fs.readFileSync("./datas/Adminsave.json")?.toString() ?? '[]'
+			fs.readFileSync("./datas/AdminSave.json")?.toString() ?? '[]'
 		);
-
 		return adminData.map((adminData) => {
 			const restoredadmin = new admin(adminData.phoneNumber);
 			restoredadmin.receviedHistory = adminData.receviedHistory;
@@ -33,7 +32,6 @@ function restoreadminFromFile(): Array<admin> {
 			return restoredadmin;
 		});
 	}
-
 	return [];
 }
 

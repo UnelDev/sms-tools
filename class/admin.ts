@@ -23,8 +23,8 @@ export default class admin {
 	async save() {
 		try {
 			let adminArray: Array<admin> = [];
-			if (fs.existsSync('./datas/Adminsave.json')) {
-				adminArray = JSON.parse(fs.readFileSync('./datas/Adminsave.json').toString());
+			if (fs.existsSync('./datas/AdminSave.json')) {
+				adminArray = JSON.parse(fs.readFileSync('./datas/AdminSave.json').toString());
 				const index = adminArray.findIndex((u) => u.phoneNumber === this.phoneNumber);
 				if (index !== -1) {
 					adminArray[index] = this;
@@ -34,7 +34,7 @@ export default class admin {
 			} else {
 				adminArray.push(this);
 			}
-			fs.writeFileSync('./datas/Adminsave.json', JSON.stringify(adminArray));
+			fs.writeFileSync('./datas/AdminSave.json', JSON.stringify(adminArray));
 		} catch (err) {
 			console.error('Error while saving admin:', err);
 		}
