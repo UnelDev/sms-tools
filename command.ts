@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { getAdminByPhoneNumber, getUserByPhoneNumber, isAdminPhoneNumber, isUserPhoneNumber, removeEmoji } from "./Utils";
+import { getAdminByPhoneNumber, getUserByPhoneNumber, isAdminPhoneNumber, isUserPhoneNumber, removeAll } from "./Utils";
 import admin from "./class/admin";
 import llama from "./class/llama";
 import sms from "./class/smsSender";
@@ -107,7 +107,7 @@ function ping(phoneNumber: string, req: any, internal: number, llamaAPI: llama, 
 	}).then(() => {
 		const pingMessage = `ping:
 sms[${req.body.pingSms.replace('.0', '')}s]
-internal loop[${Date.now() - internal - start}ms]
+internal loop[${(Date.now() - internal) + (Date.now() - start)}ms]
 llama[${((Date.now() - start) / 1000).toFixed(1)}s]
 total = ${(parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now() - start) / 1000).toFixed(1)))} s.`
 		const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
@@ -126,29 +126,33 @@ total = ${(parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now(
 				smsAPI.sendSms(phoneNumber, pingMessage);
 			}
 		}
-		console.log(`[${chalk.green('success command')}] ` + pingMessage.replace('\n', ''));
+		console.log(`[${chalk.green('success command')}] ` + removeAll(pingMessage, '\n', ' '));
 	});
 }
 
 function pingProg(phoneNumber: string, req: any, internal: number, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
 	const pingSms = parseInt(req.body.pingSms.replace('.0', ''));
 	const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
+	const pingMessage = `ping:
+sms[${pingSms}s]
+internal[${((Date.now() - internal))}ms]
+total = ${(pingSms + parseFloat(((Date.now() - internal) / 1000).toFixed(1)))} s.`;
 	if (typeof admin != "undefined") {
-		admin.sendMessage(`ping: sms[${pingSms}s]internal[${((Date.now() - internal))}ms]total = ${(pingSms + parseFloat(((Date.now() - internal) / 1000).toFixed(1)))} s.`, smsAPI);
+		admin.sendMessage(pingMessage, smsAPI);
 	} else {
 		const user = getUserByPhoneNumber(userArray, phoneNumber);
 		if (typeof user != "undefined") {
 			const user = getUserByPhoneNumber(userArray, phoneNumber);
 			if (user) {
-				user.sendMessage(`ping: sms[${pingSms}s]internal[${((Date.now() - internal))}ms]total = ${(pingSms + parseFloat(((Date.now() - internal) / 1000).toFixed(1)))} s.`, smsAPI);
+				user.sendMessage(pingMessage, smsAPI);
 			} else {
 				console.log('[' + chalk.red('Error') + '] no user found : ' + phoneNumber);
 			}
 		} else {
-			smsAPI.sendSms(phoneNumber, `ping: sms[${pingSms}s]internal[${((Date.now() - internal))}ms]total = ${(pingSms + parseFloat(((Date.now() - internal) / 1000).toFixed(1)))} s.`);
+			smsAPI.sendSms(phoneNumber, pingMessage);
 		}
 	}
-	console.log(`[${chalk.green('success command')}]ping: sms[${pingSms}s]internal[${((Date.now() - internal))}ms]total = ${(pingSms + parseFloat(((Date.now() - internal) / 1000).toFixed(1)))} s.`);
+	console.log(`[${chalk.green('success command')}] ` + removeAll(pingMessage, '\n', ' '));
 }
 
 function restart(phoneNumber: string, llamaAPI: llama, smsAPI: sms) {
