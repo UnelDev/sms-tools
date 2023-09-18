@@ -27,6 +27,7 @@ export default function command(message: string, phoneNumber: string, req: any, 
 			responding = true;
 		} else if (command[0] == 'pingprog') {
 			pingProg(phoneNumber, req, internal, smsAPI, adminArray, userArray);
+			responding = true;
 		}
 	}
 	if (!responding) {
@@ -107,7 +108,7 @@ function ping(phoneNumber: string, req: any, internal: number, llamaAPI: llama, 
 	}).then(() => {
 		const pingMessage = `ping:
 sms[${req.body.pingSms.replace('.0', '')}s]
-internal loop[${(Date.now() - internal) + (Date.now() - start)}ms]
+internal loop[${(Date.now() - internal) - (Date.now() - start)}ms]
 llama[${((Date.now() - start) / 1000).toFixed(1)}s]
 total = ${(parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now() - start) / 1000).toFixed(1)))} s.`
 		const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
@@ -131,12 +132,9 @@ total = ${(parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now(
 }
 
 function pingProg(phoneNumber: string, req: any, internal: number, smsAPI: sms, adminArray: Array<admin>, userArray: Array<user>) {
-	const pingSms = parseInt(req.body.pingSms.replace('.0', ''));
 	const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
 	const pingMessage = `ping:
-sms[${pingSms}s]
-internal[${((Date.now() - internal))}ms]
-total = ${(pingSms + parseFloat(((Date.now() - internal) / 1000).toFixed(1)))} s.`;
+internal ping [${((Date.now() - internal))}ms]`;
 	if (typeof admin != "undefined") {
 		admin.sendMessage(pingMessage, smsAPI);
 	} else {
