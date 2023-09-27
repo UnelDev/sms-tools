@@ -49,21 +49,26 @@ async function main() {
 			console.log('[' + chalk.yellow('COMMAND') + '] \'' + chalk.bold(phoneNumber) + '\': ' + message);
 			command(message, phoneNumber, req, Date.now(), smsAPI, llamaAPI, adminArray, userArray, curentHistory);
 		} else {
-			process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
-
-			const targetUser = userArray.find(Element => Element.phoneNumber == phoneNumber);
-			if (typeof targetUser == 'undefined') { targetUser == new user(phoneNumber) }
-
-			if (curentHistory[curentHistory.length - 1][0].getTime() + 300_000 < new Date().getTime()
-				|| curentHistory[curentHistory.length - 1][1] == targetUser.phoneNumber
-				|| message.includes('!bypass')) {
-				targetUser.newMessage(message, smsAPI, llamaAPI, curentHistory);
-			} else {
-				targetUser.sendMessage("already under discussion add !bypass for bypass", smsAPI);
-			}
+			ProcessMessage(phoneNumber, userArray, curentHistory, message, smsAPI, llamaAPI);
 		}
 	});
 }
 
 console.clear();
 main();
+
+
+function ProcessMessage(phoneNumber: any, userArray: user[], curentHistory: [Date, string, string][], message: string, smsAPI: sms, llamaAPI: llama) {
+	process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
+
+	const targetUser = userArray.find(Element => Element.phoneNumber == phoneNumber);
+	if (typeof targetUser == 'undefined') { targetUser == new user(phoneNumber); }
+
+	if (curentHistory[curentHistory.length - 1][0].getTime() + 300000 < new Date().getTime()
+		|| curentHistory[curentHistory.length - 1][1] == targetUser.phoneNumber
+		|| message.includes('.bypass')) {
+		targetUser.newMessage(message, smsAPI, llamaAPI, curentHistory);
+	} else {
+		targetUser.sendMessage("already under discussion add .bypass for bypass", smsAPI);
+	}
+}
