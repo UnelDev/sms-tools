@@ -9,12 +9,14 @@ export default class user {
 	receviedHistory: Array<string>;
 	sendHistory: Array<string>;
 	isBan: Date;
-	constructor(phoneNumber: string, firstMessage = false, receviedHistory = [], sendHistory = [], isBan = new Date(0)) {
+	lastMessage: Date;
+	constructor(phoneNumber: string, firstMessage = false, receviedHistory = [], sendHistory = [], isBan = new Date(0), lastMessage = new Date(0)) {
 		this.phoneNumber = phoneNumber;
 		this.firstMessage = firstMessage;
 		this.receviedHistory = receviedHistory;
 		this.sendHistory = sendHistory;
 		this.isBan = isBan;
+		this.lastMessage = lastMessage;
 		this.save();
 	}
 
@@ -25,22 +27,21 @@ export default class user {
 		this.save();
 	}
 
-	newMessage(phoneNumber: string, message: string, smsAPI: sms, llamaAPI: llama): boolean {
-		if (phoneNumber != this.phoneNumber) { return (false) };
+	newMessage(message: string, smsAPI: sms, llamaAPI: llama, curentHistory: Array<[Date, string, string]>){
 		if (this.isBan > new Date()) {
 			console.log(chalk.red("from baned user") + ": " + message);
-			return (true);
 		}
-		if (message.replace('\n', '').replace(' ', '') == '') { return (false) };
+		if (message.replace('\n', '').replace(' ', '') == '') { return };
 		this.firstMessageCheck(smsAPI);
 		this.receviedHistory.push(message);
+		curentHistory.push([new Date, this.phoneNumber, message]);
 		this.save();
 
 		llamaAPI.send(message, answer => {
 			console.log('[' + chalk.green('LLama response') + '] \'' + answer + '\'');
+			curentHistory.push([new Date(), this.phoneNumber, answer]);
 			this.sendMessage(answer, smsAPI);
 		});
-		return (true);
 	}
 
 	async save() {

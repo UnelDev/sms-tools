@@ -12,7 +12,8 @@ function restoreUsersFromFile(): Array<user> {
 				userData.firstMessage,
 				userData.receviedHistory,
 				userData.sendHistory,
-				userData.isBan);
+				userData.isBan,
+				userData.lastMessage);
 			return restoredUser;
 		});
 	}

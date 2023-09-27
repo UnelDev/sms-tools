@@ -5,7 +5,7 @@ import llama from "./class/llama";
 import sms from "./class/smsSender";
 import user from "./class/user";
 
-export default function command(message: string, phoneNumber: string, req: any, internal: number, smsAPI: sms, llamaAPI: llama, adminArray: Array<admin>, userArray: Array<user>) {
+export default function command(message: string, phoneNumber: string, req: any, internal: number, smsAPI: sms, llamaAPI: llama, adminArray: Array<admin>, userArray: Array<user>, curentHistory:Array<[Date, string, string]> ) {
 	const command = message.split(' ');
 	let responding = false;
 	if (isAdminPhoneNumber(adminArray, phoneNumber)) {
@@ -17,6 +17,12 @@ export default function command(message: string, phoneNumber: string, req: any, 
 			responding = true;
 		} else if (command[0] == 'restart') {
 			restart(phoneNumber, llamaAPI, smsAPI);
+			responding = true;
+		} else if (command[0] == 'history'){
+			let sendCurentHistory = curentHistory.map(Element=>{
+				return(`at ${Element[0].toLocaleString()} from ${Element[1]}: ${Element[2]}`);
+			})
+			adminArray.find(el=>el.phoneNumber == phoneNumber).sendMessage(sendCurentHistory.join('\n'), smsAPI);
 			responding = true;
 		}
 	}

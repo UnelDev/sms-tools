@@ -22,7 +22,7 @@ async function main() {
 	app.use(express.json());
 	const port = 5000;
 	const prefix = '!';
-
+	let curentHistory:Array<[Date, string, string]> = [[new Date(0), '0000000000', 'started']]
 
 	app.listen(port, () => {
 		console.log('Listening on port ' + port);
@@ -47,18 +47,19 @@ async function main() {
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
 			console.log('[' + chalk.yellow('COMMAND') + '] \'' + chalk.bold(phoneNumber) + '\': ' + message);
-			command(message, phoneNumber, req, Date.now(), smsAPI, llamaAPI, adminArray, userArray);
+			command(message, phoneNumber, req, Date.now(), smsAPI, llamaAPI, adminArray, userArray, curentHistory);
 		} else {
 			process.stdout.write('[' + chalk.blue('MESSAGE') + '] \'' + chalk.bold(phoneNumber) + '\': ');
-			let exist: boolean[] | undefined;
-			if (userArray.length != 0) {
-				exist = userArray.map(element => element.newMessage(phoneNumber, message, smsAPI, llamaAPI));
+			
+			const targetUser =  userArray.find(Element=>Element.phoneNumber == phoneNumber);
+			if(typeof targetUser == 'undefined') {targetUser == new user(phoneNumber)}
+			
+			if(curentHistory[curentHistory.length][0].getTime() + 300 > new Date().getTime()
+			&& curentHistory[curentHistory.length][1] != targetUser.phoneNumber && message.includes('!bypass')){
+				targetUser.sendMessage("already under discussion add !bypass for bypass", smsAPI);
 			}
-			if (!exist?.some(Element => Element == true)) {
-				const User = new user(phoneNumber);
-				User.newMessage(phoneNumber, message, smsAPI, llamaAPI);
-				userArray = restoreUsersFromFile();
-			}
+
+			targetUser.newMessage(message, smsAPI, llamaAPI, curentHistory);
 		}
 	});
 }

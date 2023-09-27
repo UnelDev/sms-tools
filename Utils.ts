@@ -61,6 +61,7 @@ function removeAll(str: string, remplace: string, remplaceBy = '') {
 	}
 	return str;
 }
+
 export {
 	IsPhoneNumber,
 	isAdminPhoneNumber,
