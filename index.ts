@@ -53,9 +53,9 @@ async function main() {
 			
 			const targetUser =  userArray.find(Element=>Element.phoneNumber == phoneNumber);
 			if(typeof targetUser == 'undefined') {targetUser == new user(phoneNumber)}
-			
-			if(curentHistory[curentHistory.length][0].getTime() + 300 > new Date().getTime()
-			&& curentHistory[curentHistory.length][1] != targetUser.phoneNumber && message.includes('!bypass')){
+			console.log(curentHistory);
+			if(curentHistory[curentHistory.length-1][0].getTime() + 300 > new Date().getTime()
+			&& curentHistory[curentHistory.length-1][1] != targetUser.phoneNumber && message.includes('!bypass')){
 				targetUser.sendMessage("already under discussion add !bypass for bypass", smsAPI);
 			}
 
