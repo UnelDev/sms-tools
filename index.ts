@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import express from 'express';
-import { IsPhoneNumber, removeEmoji, removeAll, toReadableDuration } from './Utils';
+import { IsPhoneNumber, removeEmoji, removeAll } from './Utils';
 import user from './class/user';
 import llama from './class/llama';
 import sms from './class/smsSender';
