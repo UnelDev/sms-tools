@@ -1,5 +1,5 @@
-import admin from "./class/admin";
-import user from "./class/user";
+import admin from './class/admin';
+import user from './class/user';
 
 function IsPhoneNumber(number: any) {
 	if (typeof number != 'string') return false;
@@ -10,7 +10,7 @@ function IsPhoneNumber(number: any) {
 
 function isAdminPhoneNumber(adminArray: Array<admin>, phoneNumber: string): boolean {
 	let isAdmin = false;
-	adminArray.forEach((adminInstance) => {
+	adminArray.forEach(adminInstance => {
 		if (adminInstance.phoneNumber == phoneNumber) {
 			isAdmin = true;
 		}
@@ -20,7 +20,7 @@ function isAdminPhoneNumber(adminArray: Array<admin>, phoneNumber: string): bool
 
 function isUserPhoneNumber(UserArray: Array<user>, phoneNumber: string): boolean {
 	let isUser = false;
-	UserArray.forEach((UserInstance) => {
+	UserArray.forEach(UserInstance => {
 		if (UserInstance.phoneNumber == phoneNumber) {
 			isUser = true;
 		}
@@ -30,29 +30,32 @@ function isUserPhoneNumber(UserArray: Array<user>, phoneNumber: string): boolean
 
 function getAdminByPhoneNumber(adminArray: Array<admin>, phoneNumber: string): admin | undefined {
 	let admin: admin | undefined = undefined;
-	adminArray.forEach((adminInstance) => {
+	adminArray.forEach(adminInstance => {
 		if (adminInstance.phoneNumber == phoneNumber) {
 			admin = adminInstance;
 		}
 	});
-	return (admin);
+	return admin;
 }
 
 function getUserByPhoneNumber(UserArray: Array<user>, phoneNumber: string): user | undefined {
 	let user: user | undefined = undefined;
-	UserArray.forEach((UserInstance) => {
+	UserArray.forEach(UserInstance => {
 		if (UserInstance.phoneNumber == phoneNumber) {
 			user = UserInstance;
 		}
 	});
-	return (user);
+	return user;
 }
 
 function removeEmoji(str: string) {
 	if (!str) {
 		return '';
 	}
-	return str.replace(/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g, '');
+	return str.replace(
+		/([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF])/g,
+		''
+	);
 }
 
 function removeAll(str: string, remplace: string, remplaceBy = '') {
@@ -62,6 +65,28 @@ function removeAll(str: string, remplace: string, remplaceBy = '') {
 	return str;
 }
 
+function toReadableDuration(time: number) {
+	if (isNaN(time)) {
+		return `--:--`;
+	}
+
+	time = Math.floor(time / 1000);
+
+	const seconds = time % 60;
+	const minutes = Math.floor(time / 60);
+	const hours = Math.floor(minutes / 60);
+
+	if (minutes > 0) {
+		if (hours > 0) {
+			return `${hours}:${(minutes % 60).toString().padStart(2, '0')}:${(seconds % 60)
+				.toString()
+				.padStart(2, '0')}`;
+		}
+		return `${minutes % 60}:${(seconds % 60).toString().padStart(2, '0')}`;
+	}
+	return `0:${(seconds % 60).toString().padStart(2, '0')}`;
+}
+
 export {
 	IsPhoneNumber,
 	isAdminPhoneNumber,
@@ -69,5 +94,6 @@ export {
 	getAdminByPhoneNumber,
 	getUserByPhoneNumber,
 	removeEmoji,
-	removeAll
+	removeAll,
+	toReadableDuration
 };
