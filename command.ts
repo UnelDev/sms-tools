@@ -31,7 +31,7 @@ export default function command(
 		} else if (command[0] == 'history') {
 			let sendCurentHistory = curentHistory.map((Element, i) => {
 				if (i % 2) return `at ${Element[0].toLocaleString()} from ${Element[1]}: ${Element[2]}`;
-				return `at ${Element[0].toLocaleString()} from Bob: ${Element[2]}`;
+				return `at ${Element[0].toLocaleString()} from Carol: ${Element[2]}`;
 			});
 			adminArray.find(el => el.phoneNumber == phoneNumber).sendMessage(sendCurentHistory.join('\n'), smsAPI);
 			responding = true;
