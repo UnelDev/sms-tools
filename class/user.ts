@@ -1,7 +1,7 @@
-import chalk from 'chalk';
-import llama from './llama';
-import sms from './smsSender';
-import fs from 'fs';
+import chalk from "chalk";
+import llama from "./llama";
+import sms from "./smsSender";
+import fs from "fs";
 
 export default class user {
 	phoneNumber: string;
@@ -10,14 +10,7 @@ export default class user {
 	sendHistory: Array<string>;
 	isBan: Date;
 	lastMessage: Date;
-	constructor(
-		phoneNumber: string,
-		firstMessage = false,
-		receviedHistory = [],
-		sendHistory = [],
-		isBan = new Date(0),
-		lastMessage = new Date(0)
-	) {
+	constructor(phoneNumber: string, firstMessage = false, receviedHistory = [], sendHistory = [], isBan = new Date(0), lastMessage = new Date(0)) {
 		this.phoneNumber = phoneNumber;
 		this.firstMessage = firstMessage;
 		this.receviedHistory = receviedHistory;
@@ -34,20 +27,18 @@ export default class user {
 		this.save();
 	}
 
-	newMessage(message: string, smsAPI: sms, llamaAPI: llama, curentHistory: Array<[Date, string, string]>) {
+	newMessage(message: string, smsAPI: sms, llamaAPI: llama, curentHistory: Array<[Date, string, string]>){
 		if (this.isBan > new Date()) {
-			console.log(chalk.red('from baned user') + ': ' + message);
+			console.log(chalk.red("from baned user") + ": " + message);
 		}
-		if (message.replace('\n', '').replace(' ', '') == '') {
-			return;
-		}
+		if (message.replace('\n', '').replace(' ', '') == '') { return };
 		this.firstMessageCheck(smsAPI);
 		this.receviedHistory.push(message);
-		curentHistory.push([new Date(), this.phoneNumber, message]);
+		curentHistory.push([new Date, this.phoneNumber, message]);
 		this.save();
 
 		llamaAPI.send(message, answer => {
-			console.log('[' + chalk.green('LLama response') + "] '" + answer + "'");
+			console.log('[' + chalk.green('LLama response') + '] \'' + answer + '\'');
 			curentHistory.push([new Date(), this.phoneNumber, answer]);
 			this.sendMessage(answer, smsAPI);
 		});
@@ -58,7 +49,7 @@ export default class user {
 			let userArray: Array<user> = [];
 			if (fs.existsSync('./datas/UserSave.json')) {
 				userArray = JSON.parse(fs.readFileSync('./datas/UserSave.json').toString());
-				const index = userArray.findIndex(u => u.phoneNumber === this.phoneNumber);
+				const index = userArray.findIndex((u) => u.phoneNumber === this.phoneNumber);
 				if (index !== -1) {
 					userArray[index] = this;
 				} else {
@@ -73,14 +64,13 @@ export default class user {
 		}
 	}
 
+
 	private firstMessageCheck(smsAPI: sms) {
 		if (!this.firstMessage) {
 			this.firstMessage = true;
 			this.save();
-			this.sendMessage(
-				'Congratulations, you have send your first message. Warning all data send by Carol can be wrong. good disscution',
-				smsAPI
-			);
+			this.sendMessage('congratulations, you have send your first message, warning all data send by bob can be wrong. good disscution', smsAPI);
 		}
 	}
+
 }
