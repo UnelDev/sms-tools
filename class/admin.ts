@@ -3,7 +3,7 @@ import sms from "./smsSender";
 
 export default class admin {
 	phoneNumber: string;
-	actionHistory: Array<[Date, string]>
+	actionHistory: Array<[Date, string]>;
 	receviedHistory: Array<string>;
 	sendHistory: Array<string>;
 	constructor(phoneNumber: string, receviedHistory = [], sendHistory = [], actionHistory = []) {
@@ -25,7 +25,7 @@ export default class admin {
 			let adminArray: Array<admin> = [];
 			if (fs.existsSync('./datas/AdminSave.json')) {
 				adminArray = JSON.parse(fs.readFileSync('./datas/AdminSave.json').toString());
-				const index = adminArray.findIndex((u) => u.phoneNumber === this.phoneNumber);
+				const index = adminArray.findIndex(u => u.phoneNumber === this.phoneNumber);
 				if (index !== -1) {
 					adminArray[index] = this;
 				} else {

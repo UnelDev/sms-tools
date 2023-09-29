@@ -89,9 +89,9 @@ function ProcessMessage(
 		targetUser.newMessage(message, smsAPI, llamaAPI, curentHistory);
 	} else {
 		targetUser.sendMessage(
-			'already under discussion add .bypass for bypass, last message ' +
+			'Bob\'s already talking to someone. Add ".bypass" before your message to bypass this security.\n Last message sent ' +
 				(new Date().getTime() - curentHistory[curentHistory.length - 1][0].getTime()) / 1000 +
-				's ago',
+				's ago.',
 			smsAPI
 		);
 	}

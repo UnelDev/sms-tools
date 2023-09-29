@@ -99,8 +99,8 @@ function banUser(
 		'You have been baned by an administrator until ' + user.isBan.toLocaleString('fr-FR', { timeZone: 'UTC' }),
 		smsAPI
 	);
-	admin.sendMessage('User ' + user.phoneNumber + ' has be banish', smsAPI);
-	console.log('[' + chalk.green('success command') + '] User ' + user.phoneNumber + ' has be banish');
+	admin.sendMessage('User ' + user.phoneNumber + ' has be banned', smsAPI);
+	console.log('[' + chalk.green('Success command') + '] User ' + user.phoneNumber + ' has be banned');
 }
 
 function unbanUser(
@@ -128,9 +128,9 @@ function unbanUser(
 	const user = getUserByPhoneNumber(userArray, command[1]);
 	user.isBan = new Date(0);
 	user.save();
-	user.sendMessage('You have been unbaned by an administrator', smsAPI);
-	admin.sendMessage('User ' + user.phoneNumber + ' has be unbanish', smsAPI);
-	console.log('[' + chalk.green('success command') + '] User' + user.phoneNumber + ' has be unbanish');
+	user.sendMessage('You have been unbanned by an administrator', smsAPI);
+	admin.sendMessage('User ' + user.phoneNumber + ' has be unbanned', smsAPI);
+	console.log('[' + chalk.green('Success command') + '] User' + user.phoneNumber + ' has be unbanned');
 }
 
 function ping(
@@ -161,13 +161,13 @@ total = ${parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now()
 				if (user) {
 					user.sendMessage(pingMessage, smsAPI);
 				} else {
-					console.log('[' + chalk.red('Error') + '] no user found : ' + phoneNumber);
+					console.log('[' + chalk.red('Error') + '] No user found : ' + phoneNumber);
 				}
 			} else {
 				smsAPI.sendSms(phoneNumber, pingMessage);
 			}
 		}
-		console.log(`[${chalk.green('success command')}] ` + removeAll(pingMessage, '\n', ' '));
+		console.log(`[${chalk.green('Success command')}] ` + removeAll(pingMessage, '\n', ' '));
 	});
 }
 
@@ -191,20 +191,20 @@ internal ping [${Date.now() - internal}ms]`;
 			if (user) {
 				user.sendMessage(pingMessage, smsAPI);
 			} else {
-				console.log('[' + chalk.red('Error') + '] no user found : ' + phoneNumber);
+				console.log('[' + chalk.red('Error') + '] No user found : ' + phoneNumber);
 			}
 		} else {
 			smsAPI.sendSms(phoneNumber, pingMessage);
 		}
 	}
-	console.log(`[${chalk.green('success command')}] ` + removeAll(pingMessage, '\n', ' '));
+	console.log(`[${chalk.green('Success command')}] ` + removeAll(pingMessage, '\n', ' '));
 }
 
 function restart(phoneNumber: string, llamaAPI: llama, smsAPI: sms) {
-	console.log('[' + chalk.green('success command') + '] Restarting system...');
+	console.log('[' + chalk.green('Success command') + '] Restarting system...');
 	smsAPI.sendSms(phoneNumber, 'Restarting system...');
 	llamaAPI.restart(() => {
 		smsAPI.sendSms(phoneNumber, 'restart completed');
-		console.log('[' + chalk.green('success command') + '] System restarted!');
+		console.log('[' + chalk.green('Success command') + '] System restarted!');
 	});
 }

@@ -9,14 +9,26 @@ export default class sms {
 		this.sendingList = [];
 		exec('adb version', (error: any, stdout: any, stderr: any) => {
 			if (error || stderr) {
-				console.log('[' + chalk.red('sms error') + ']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' + stderr);
-				return (false);
+				console.log(
+					'[' +
+						chalk.red('sms error') +
+						']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' +
+						stderr
+				);
+				return false;
 			}
 			exec('adb devices', (error, stdout) => {
-				const devices = stdout.split('\n').slice(1).filter(line => line.includes('device'));
+				const devices = stdout
+					.split('\n')
+					.slice(1)
+					.filter(line => line.includes('device'));
 				if (devices.length === 0) {
-					console.log('[' + chalk.red('sms error') + '] No Android device is connected. Please connect a device to run this program.');
-					return (false);
+					console.log(
+						'[' +
+							chalk.red('sms error') +
+							'] No Android device is connected. Please connect a device to run this program.'
+					);
+					return false;
 				}
 			});
 		});
@@ -28,52 +40,76 @@ export default class sms {
 	}
 
 	private sendinAdb() {
-		if (this.processing || this.sendingList.length == 0) { return }
+		if (this.processing || this.sendingList.length == 0) {
+			return;
+		}
 		this.processing = true;
 		const phoneNumber = this.sendingList[0][0];
 		const message = this.sendingList[0][1];
 		// Check if ADB is installed
 		exec('adb version', (error: any, stdout: any, stderr: any) => {
 			if (error || stderr) {
-				console.log('[' + chalk.red('sms error') + ']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' + stderr);
+				console.log(
+					'[' +
+						chalk.red('sms error') +
+						']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' +
+						stderr
+				);
 				return;
 			}
 
 			// Check if an Android device is connected
 			exec('adb devices', (error, stdout) => {
-				const devices = stdout.split('\n').slice(1).filter(line => line.includes('device'));
+				const devices = stdout
+					.split('\n')
+					.slice(1)
+					.filter(line => line.includes('device'));
 				if (devices.length === 0) {
-					console.log('[' + chalk.red('sms error') + '] No Android device is connected. Please connect a device to run this program.');
+					console.log(
+						'[' +
+							chalk.red('sms error') +
+							'] No Android device is connected. Please connect a device to run this program.'
+					);
 				}
 
 				// Send the SMS
-				exec(`adb shell "am start -a android.intent.action.SENDTO -d sms:${phoneNumber} --es sms_body \\"${message}\\" --ez exit_on_sent true"`, (error, stdout, stderr) => {
-					if (error || stderr) {
-						console.log('[' + chalk.red('sms error') + '] An error occurred while sending the SMS: ' + stderr);
-						return;
+				exec(
+					`adb shell "am start -a android.intent.action.SENDTO -d sms:${phoneNumber} --es sms_body \\"${message}\\" --ez exit_on_sent true"`,
+					(error, stdout, stderr) => {
+						if (error || stderr) {
+							console.log(
+								'[' + chalk.red('sms error') + '] An error occurred while sending the SMS: ' + stderr
+							);
+							return;
+						}
+
+						// Wait for 1 second
+						setTimeout(() => {
+							// Click coordinates
+							const x = 979;
+							const y = 2245;
+
+							// Tap the button at the specified position
+							exec(`adb shell input tap ${x} ${y}`, (error: any, stdout: any, stderr: any) => {
+								if (error || stderr) {
+									console.log(
+										'[' +
+											chalk.red('sms error') +
+											'] An error occurred while tapping the button: ' +
+											stderr
+									);
+									return;
+								}
+								setTimeout(() => {
+									exec('adb shell "am force-stop com.moez.QKSMS"');
+									this.sendingList.shift();
+									this.processing = false;
+									this.sendinAdb();
+								}, 500);
+							});
+						}, 1000);
 					}
-
-					// Wait for 1 second
-					setTimeout(() => {
-						// Click coordinates
-						const x = 979;
-						const y = 2245;
-
-						// Tap the button at the specified position
-						exec(`adb shell input tap ${x} ${y}`, (error: any, stdout: any, stderr: any) => {
-							if (error || stderr) {
-								console.log('[' + chalk.red('sms error') + '] An error occurred while tapping the button: ' + stderr);
-								return;
-							}
-							setTimeout(() => {
-								exec('adb shell "am force-stop com.moez.QKSMS"');
-								this.sendingList.shift();
-								this.processing = false;
-								this.sendinAdb();
-							}, 500);
-						});
-					}, 1000);
-				});
+				);
 			});
 		});
 	}
