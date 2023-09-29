@@ -1,11 +1,12 @@
 import chalk from 'chalk';
 import express from 'express';
-import { IsPhoneNumber, removeEmoji, removeAll } from './Utils';
-import user from './class/user';
-import llama from './class/llama';
-import sms from './class/smsSender';
-import { restoreUsersFromFile, restoreadminFromFile } from './class/restore';
+
+import { IsPhoneNumber, removeAll, removeEmoji } from './Utils';
 import admin from './class/admin';
+import llama from './class/llama';
+import { restoreUsersFromFile, restoreadminFromFile } from './class/restore';
+import sms from './class/smsSender';
+import user from './class/user';
 import command from './command';
 
 async function main() {

@@ -1,7 +1,8 @@
-import chalk from "chalk";
-import llama from "./llama";
-import sms from "./smsSender";
-import fs from "fs";
+import chalk from 'chalk';
+import fs from 'fs';
+
+import llama from './llama';
+import sms from './smsSender';
 
 export default class user {
 	phoneNumber: string;

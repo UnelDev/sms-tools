@@ -1,6 +1,7 @@
-import fs from "fs";
-import user from "./user";
-import admin from "./admin";
+import fs from 'fs';
+
+import admin from './admin';
+import user from './user';
 
 function restoreUsersFromFile(): Array<user> {
 	if (fs.existsSync('./datas/UserSave.json')) {

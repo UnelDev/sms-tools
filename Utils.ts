@@ -67,10 +67,10 @@ function removeAll(str: string, remplace: string, remplaceBy = '') {
 
 export {
 	IsPhoneNumber,
-	isAdminPhoneNumber,
-	isUserPhoneNumber,
 	getAdminByPhoneNumber,
 	getUserByPhoneNumber,
-	removeEmoji,
-	removeAll
+	isAdminPhoneNumber,
+	isUserPhoneNumber,
+	removeAll,
+	removeEmoji
 };

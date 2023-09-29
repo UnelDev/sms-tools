@@ -1,5 +1,6 @@
-import fs from "fs";
-import sms from "./smsSender";
+import fs from 'fs';
+
+import sms from './smsSender';
 
 export default class admin {
 	phoneNumber: string;
