@@ -6,17 +6,17 @@ export default class llama {
 	childProcess: import('child_process').ChildProcessWithoutNullStreams;
 	computing: boolean;
 	request: Array<[string, (response: string) => void]>;
-	link: string;
+	settings: string;
 	started: boolean;
 	onStart: Function;
 
-	constructor(link: string, onStart: Function) {
+	constructor(settings: string, onStart: Function) {
 		this.computing = false;
 		this.request = [];
 		this.message = '';
-		this.link = link;
+		this.settings = settings;
 		this.started = false;
-		this.childProcess = spawn('bash', [link], { shell: true });
+		this.childProcess = spawn(__dirname + '../llama-cpp/main', [settings], { shell: true });
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
@@ -27,7 +27,7 @@ export default class llama {
 
 		const outputStream = this.childProcess.stdout;
 		outputStream.on('data', data => {
-			this.awnser(data);
+			this.answer(data);
 		});
 
 		this.send('Please tell me the largest city in Europe.', () => null);
@@ -44,7 +44,7 @@ export default class llama {
 		this.message = '';
 		this.computing = false;
 		this.request = [];
-		this.childProcess = spawn('bash', [this.link], { shell: true });
+		this.childProcess = spawn('bash', [this.settings], { shell: true });
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
@@ -54,7 +54,7 @@ export default class llama {
 
 		const outputStream = this.childProcess.stdout;
 		outputStream.on('data', data => {
-			this.awnser(data);
+			this.answer(data);
 		});
 		this.onStart = onStart;
 		this.started = false;
@@ -68,7 +68,7 @@ export default class llama {
 		this.childProcess.stdin.write('');
 	}
 
-	private awnser(data: any) {
+	private answer(data: any) {
 		this.message += data.toString();
 		const ArrayOfMessage = this.message.split('\n');
 		if (!this.started) {
