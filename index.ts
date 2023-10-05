@@ -20,7 +20,7 @@ async function main() {
 	const llamaAPI = await new Promise<llama>(resolve => {
 		const l = new llama(
 			[
-				'-m models/llama-7b/ggml-model-q4_0.gguf',
+				'-m ../llama.cpp/models/llama-7b/ggml-model-q4_0.gguf',
 				'-c 512',
 				'-b 1024',
 				'-n 256',
@@ -28,7 +28,7 @@ async function main() {
 				'--repeat-penality 1.0',
 				'-i',
 				'-r "User:"',
-				'-f prompts/chat-with-bob.txt'
+				'-f ../llama.cpp/prompts/chat-with-bob.txt'
 			],
 			() => resolve(l)
 		);
