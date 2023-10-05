@@ -19,7 +19,17 @@ async function main() {
 	let adminArray: Array<admin> = restoreadminFromFile();
 	const llamaAPI = await new Promise<llama>(resolve => {
 		const l = new llama(
-			'-m models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penality 1.0 -i -r "User:" -f prompts/chat-with-bob.txt',
+			[
+				'-m models/llama-7b/ggml-model-q4_0.gguf',
+				'-c 512',
+				'-b 1024',
+				'-n 256',
+				'--keep 48',
+				'--repeat-penality 1.0',
+				'-i',
+				'-r "User:"',
+				'-f prompts/chat-with-bob.txt'
+			],
 			() => resolve(l)
 		);
 	});

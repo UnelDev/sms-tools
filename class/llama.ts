@@ -6,17 +6,17 @@ export default class llama {
 	childProcess: import('child_process').ChildProcessWithoutNullStreams;
 	computing: boolean;
 	request: Array<[string, (response: string) => void]>;
-	settings: string;
+	settings: string[];
 	started: boolean;
 	onStart: Function;
 
-	constructor(settings: string, onStart: Function) {
+	constructor(settings: string[], onStart: Function) {
 		this.computing = false;
 		this.request = [];
 		this.message = '';
 		this.settings = settings;
 		this.started = false;
-		this.childProcess = spawn('../llama-cpp/main', [settings], { shell: true });
+		this.childProcess = spawn('../llama-cpp/main', settings, { shell: true });
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
@@ -44,7 +44,7 @@ export default class llama {
 		this.message = '';
 		this.computing = false;
 		this.request = [];
-		this.childProcess = spawn('bash', [this.settings], { shell: true });
+		this.childProcess = spawn('../llama-cpp/main', this.settings, { shell: true });
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
