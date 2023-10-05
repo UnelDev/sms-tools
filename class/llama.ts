@@ -6,17 +6,20 @@ export default class llama {
 	childProcess: import('child_process').ChildProcessWithoutNullStreams;
 	computing: boolean;
 	request: Array<[string, (response: string) => void]>;
-	settings: string[];
 	started: boolean;
 	onStart: Function;
 
-	constructor(settings: string[], onStart: Function) {
+	constructor(onStart: Function) {
 		this.computing = false;
 		this.request = [];
 		this.message = '';
-		this.settings = settings;
 		this.started = false;
-		this.childProcess = spawn('../llama.cpp/main', settings, { shell: true });
+		this.childProcess = spawn(
+			'../llama.cpp/main -m ../llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f ../llama.cpp/prompts/chat-with-bob.txt',
+			{
+				shell: true
+			}
+		);
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
@@ -44,7 +47,12 @@ export default class llama {
 		this.message = '';
 		this.computing = false;
 		this.request = [];
-		this.childProcess = spawn('../llama.cpp/main', this.settings, { shell: true });
+		this.childProcess = spawn(
+			'../llama.cpp/main -m ../llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f ../llama.cpp/prompts/chat-with-bob.txt',
+			{
+				shell: true
+			}
+		);
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});

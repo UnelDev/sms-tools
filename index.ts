@@ -18,20 +18,7 @@ async function main() {
 	let userArray: Array<user> = restoreUsersFromFile();
 	let adminArray: Array<admin> = restoreadminFromFile();
 	const llamaAPI = await new Promise<llama>(resolve => {
-		const l = new llama(
-			[
-				'-m ../llama.cpp/models/llama-7b/ggml-model-q4_0.gguf',
-				'-c 512',
-				'-b 1024',
-				'-n 256',
-				'--keep 48',
-				'--repeat-penality 1.0',
-				'-i',
-				'-r "User:"',
-				'-f ../llama.cpp/prompts/chat-with-bob.txt'
-			],
-			() => resolve(l)
-		);
+		const l = new llama(() => resolve(l));
 	});
 	console.log('Llama started!');
 	const app = express();
