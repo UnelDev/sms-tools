@@ -16,7 +16,7 @@ export default class llama {
 		this.message = '';
 		this.settings = settings;
 		this.started = false;
-		this.childProcess = spawn('../llama-cpp/main', settings, { shell: true });
+		this.childProcess = spawn('../llama.cpp/main', settings, { shell: true });
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
@@ -44,7 +44,7 @@ export default class llama {
 		this.message = '';
 		this.computing = false;
 		this.request = [];
-		this.childProcess = spawn('../llama-cpp/main', this.settings, { shell: true });
+		this.childProcess = spawn('../llama.cpp/main', this.settings, { shell: true });
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
