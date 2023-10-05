@@ -15,7 +15,7 @@ export default class llama {
 		this.message = '';
 		this.started = false;
 		this.childProcess = spawn(
-			'../llama.cpp/main -m ../llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f ../llama.cpp/prompts/chat-with-bob.txt',
+			'/opt/llama.cpp/main -m /opt/llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f /opt/llama.cpp/prompts/chat-with-bob.txt',
 			{
 				shell: true
 			}
@@ -48,7 +48,7 @@ export default class llama {
 		this.computing = false;
 		this.request = [];
 		this.childProcess = spawn(
-			'../llama.cpp/main -m ../llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f ../llama.cpp/prompts/chat-with-bob.txt',
+			'/opt/llama.cpp/main -m /opt/llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f /opt/llama.cpp/prompts/chat-with-bob.txt',
 			{
 				shell: true
 			}
