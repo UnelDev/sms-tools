@@ -1,116 +1,90 @@
-import chalk from 'chalk';
-import { exec } from 'child_process';
+import axios from 'axios';
+import express from 'express';
 
-export default class sms {
-	processing: boolean;
-	sendingList: Array<[string, string]>;
-	constructor() {
-		this.processing = false;
-		this.sendingList = [];
-		exec('adb version', (error: any, stdout: any, stderr: any) => {
-			if (error || stderr) {
-				console.log(
-					'[' +
-						chalk.red('sms error') +
-						']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' +
-						stderr
-				);
-				return false;
-			}
-			exec('adb devices', (error, stdout) => {
-				const devices = stdout
-					.split('\n')
-					.slice(1)
-					.filter(line => line.includes('device'));
-				if (devices.length === 0) {
-					console.log(
-						'[' +
-							chalk.red('sms error') +
-							'] No Android device is connected. Please connect a device to run this program.'
-					);
-					return false;
+class allInSmsClient {
+	name: string;
+	serverAdress: string;
+	prefix: string;
+	port: number;
+	isRegister: boolean;
+	expressServer: express.Application;
+	newMessageCallback: Function;
+
+	constructor(
+		port: number = 3333,
+		name: string,
+		prefix: string | 'default',
+		newMessageCallback: (message: string, phoneNumber: string, req: any) => void,
+		serverAdress: string = 'http://localhost:3000',
+		myAdress: string = 'http://localhost',
+		sucessCallback: () => void = () => null,
+		errorCallback: (err: any) => void = () => null,
+		serverStartedCallback: () => void = () => null
+	) {
+		this.port = port;
+		this.serverAdress = serverAdress;
+		this.name = name;
+		this.prefix = prefix;
+		this.newMessageCallback = newMessageCallback;
+		this.isRegister = false;
+		this.expressServer = express();
+		this.expressServer.use(express.json());
+		this.expressServer.listen(port, () => serverStartedCallback);
+		axios
+			.post(this.serverAdress + '/register', {
+				serviceName: this.name,
+				prefix: prefix,
+				callbackLink: myAdress + ':' + port
+			})
+			.then(response => {
+				if (response.status == 200) {
+					sucessCallback();
+					this.isRegister = true;
+				} else {
+					errorCallback(response.status);
 				}
-			});
+			})
+			.catch(err => errorCallback(err));
+	}
+	express() {
+		this.expressServer.get('/ping', (req: any, res: any) => {
+			res.send('pong');
+		});
+		this.expressServer.get('/newSms', (req: any) => {
+			this.newMessageCallback(req.body.message ?? '', req.body.phoneNumber ?? '');
 		});
 	}
 
-	sendSms(phoneNumber: string, message: string) {
-		this.sendingList.push([phoneNumber, message]);
-		this.sendinAdb();
+	/**
+	 * The function sends a new message to a specified phone number using all-in-sms.
+	 * @param {string} message - The message parameter is a string that represents the content of the message you want to send.
+	 * It can be any text or information that you want to communicate to the recipient.
+	 * @param {string} to - The "to" parameter is the phone number or recipient of the message. It specifies the destination of
+	 * the message.
+	 */
+	sendNewMessage(message: string, to: string) {
+		if (!this.isRegister) return;
+		axios.post(this.serverAdress + '/send', { prefix: this.prefix, message: message, phoneNumber: to });
 	}
 
-	private sendinAdb() {
-		if (this.processing || this.sendingList.length == 0) {
-			return;
-		}
-		this.processing = true;
-		const phoneNumber = this.sendingList[0][0];
-		const message = this.sendingList[0][1];
-		// Check if ADB is installed
-		exec('adb version', (error: any, stdout: any, stderr: any) => {
-			if (error || stderr) {
-				console.log(
-					'[' +
-						chalk.red('sms error') +
-						']  ADB is not installed. Please install Android Debug Bridge (ADB) to run this program: ' +
-						stderr
-				);
-				return;
-			}
-
-			// Check if an Android device is connected
-			exec('adb devices', (error, stdout) => {
-				const devices = stdout
-					.split('\n')
-					.slice(1)
-					.filter(line => line.includes('device'));
-				if (devices.length === 0) {
-					console.log(
-						'[' +
-							chalk.red('sms error') +
-							'] No Android device is connected. Please connect a device to run this program.'
-					);
+	registerOverwrite(
+		sucessCallback: Function = () => null,
+		errorCallback: Function = () => null,
+		prefix: string = this.prefix
+	) {
+		this.prefix = prefix;
+		axios
+			.post(this.serverAdress + '/registerOverwrite', { serviceName: this.name, prefix: prefix })
+			.then(response => {
+				if (response.status == 200) {
+					sucessCallback();
+					this.isRegister = true;
+				} else {
+					errorCallback();
 				}
-
-				// Send the SMS
-				exec(
-					`adb shell "am start -a android.intent.action.SENDTO -d sms:${phoneNumber} --es sms_body \\"${message}\\" --ez exit_on_sent true"`,
-					(error, stdout, stderr) => {
-						if (error || stderr) {
-							console.log(
-								'[' + chalk.red('sms error') + '] An error occurred while sending the SMS: ' + stderr
-							);
-							return;
-						}
-
-						// Wait for 1 second
-						setTimeout(() => {
-							// Click coordinates
-							const x = 979;
-							const y = 2245;
-
-							// Tap the button at the specified position
-							exec(`adb shell input tap ${x} ${y}`, (error: any, stdout: any, stderr: any) => {
-								if (error || stderr) {
-									console.log(
-										'[' +
-											chalk.red('sms error') +
-											'] An error occurred while tapping the button: ' +
-											stderr
-									);
-									return;
-								}
-								setTimeout(() => {
-									exec('adb shell "am force-stop com.moez.QKSMS"');
-									this.sendingList.shift();
-									this.processing = false;
-									this.sendinAdb();
-								}, 500);
-							});
-						}, 1000);
-					}
-				);
-			});
-		});
+			})
+			.catch(() => errorCallback);
 	}
 }
+
+export default allInSmsClient;

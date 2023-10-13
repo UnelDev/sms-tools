@@ -1,5 +1,7 @@
 import chalk from 'chalk';
 import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import { IsPhoneNumber, removeAll, removeEmoji } from './Utils';
 import admin from './class/admin';
@@ -10,58 +12,69 @@ import user from './class/user';
 import command from './command';
 
 async function main() {
+	const prefix = '!';
 	console.log('starting...');
-	const smsAPI = new sms();
-	if (!smsAPI) {
-		return;
-	}
-	let userArray: Array<user> = restoreUsersFromFile();
-	let adminArray: Array<admin> = restoreadminFromFile();
-	const llamaAPI = await new Promise<llama>(resolve => {
+	const smsAPI = new Promise<sms>((resolve, rejects) => {
+		const port = isNaN(parseInt(process.env.port)) ? 3333 : parseInt(process.env.port);
+		const mySms = new sms(
+			port,
+			'llama-sms',
+			'default',
+			newMessageCallback,
+			process.env.serverAdress ?? 'http://localhost:3000',
+			'http://localhost',
+			() => resolve(mySms),
+			rejects,
+			() => console.log('connected to smsAPI')
+		);
+	}).catch(el => {
+		console.log('error');
+		throw el;
+	});
+	const llamaAPI = new Promise<llama>(resolve => {
 		const l = new llama(() => resolve(l));
 	});
-	console.log('Llama started!');
-	const app = express();
-	app.use(express.json());
-	const port = 5000;
-	const prefix = '!';
+	let userArray: Array<user> = restoreUsersFromFile();
+	let adminArray: Array<admin> = restoreadminFromFile();
 	let curentHistory: Array<[Date, string, string]> = [[new Date(0), '0000000000', 'started']];
+	await smsAPI;
+	await llamaAPI;
+	console.log('Llama started!');
 
-	app.listen(port, () => {
-		console.log('Listening on port ' + port);
-	});
-
-	app.post('/', async (req, res) => {
-		if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') {
+	async function newMessageCallback(message: string, phoneNumber: string, req: any) {
+		if (typeof message != 'string' || typeof phoneNumber != 'string') {
 			console.log('bad body');
 			return;
 		}
-		let phoneNumber = req.body.contact;
-		let message: string = req.body.message;
-		res.status(200);
-
 		message = removeAll(message, '\n');
 		message = removeEmoji(message);
 		message.trim();
-
 		if (phoneNumber.startsWith('+33')) {
 			phoneNumber = phoneNumber.replace('+33', '0');
 		}
-
 		if (!IsPhoneNumber(phoneNumber)) {
 			console.log(
 				'[' + chalk.red('ERROR') + "] '" + 'recevied message from: ' + chalk.bold(phoneNumber) + "': " + message
 			);
 		}
-
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
 			console.log('[' + chalk.yellow('COMMAND') + "] '" + chalk.bold(phoneNumber) + "': " + message);
-			command(message, phoneNumber, req, Date.now(), smsAPI, llamaAPI, adminArray, userArray, curentHistory);
+			command(
+				message,
+				phoneNumber,
+				req,
+				Date.now(),
+				await smsAPI,
+				await llamaAPI,
+				adminArray,
+				userArray,
+				curentHistory
+			);
 		} else {
-			ProcessMessage(phoneNumber, userArray, curentHistory, message, smsAPI, llamaAPI);
+			ProcessMessage(phoneNumber, userArray, curentHistory, message, await smsAPI, await llamaAPI);
 		}
-	});
+	}
 }
 
 console.clear();

@@ -31,7 +31,7 @@ export default class user {
 	sendMessage(message: string, smsAPI: sms) {
 		this.firstMessageCheck(smsAPI);
 		this.sendHistory.push(message);
-		smsAPI.sendSms(this.phoneNumber, message);
+		smsAPI.sendNewMessage(this.phoneNumber, message);
 		this.save();
 	}
 

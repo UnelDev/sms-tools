@@ -44,7 +44,7 @@ export default function command(
 			ping(phoneNumber, req, internal, llamaAPI, smsAPI, adminArray, userArray);
 			responding = true;
 		} else if (command[0] == 'pingprog') {
-			pingProg(phoneNumber, req, internal, smsAPI, adminArray, userArray);
+			pingProg(phoneNumber, internal, smsAPI, adminArray, userArray);
 			responding = true;
 		}
 	}
@@ -62,7 +62,7 @@ function commandNotFond(phoneNumber: string, smsAPI: sms, adminArray: Array<admi
 		if (typeof user != 'undefined') {
 			user.sendMessage('Unknown command', smsAPI);
 		} else {
-			smsAPI.sendSms(phoneNumber, 'Unknown command');
+			smsAPI.sendNewMessage('Unknown command', phoneNumber);
 		}
 	}
 }
@@ -75,12 +75,12 @@ function banUser(
 	userArray: Array<user>
 ) {
 	if (command.length != 3 && command.length != 2) {
-		smsAPI.sendSms(phoneNumber, 'Syntax: ban <number> [duration]');
+		smsAPI.sendNewMessage('Syntax: ban <number> [duration]', phoneNumber);
 		return;
 	}
 	const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
 	if (typeof admin == 'undefined') {
-		smsAPI.sendSms(phoneNumber, 'Error in finding admin');
+		smsAPI.sendNewMessage('Error in finding admin', phoneNumber);
 		return;
 	}
 	if (!isUserPhoneNumber(userArray, command[1])) {
@@ -91,7 +91,7 @@ function banUser(
 	admin.save();
 	const user = getUserByPhoneNumber(userArray, command[1]);
 	if (command.length == 3 && isNaN(parseInt(command[2]))) {
-		smsAPI.sendSms(phoneNumber, 'Duration is not a number, syntax: ban <number> [duration]');
+		smsAPI.sendNewMessage('Duration is not a number, syntax: ban <number> [duration]', phoneNumber);
 		return;
 	}
 	user.isBan = new Date(command[2] ? Date.now() + parseInt(command[2]) * 1000 : 8640000000000000);
@@ -112,12 +112,12 @@ function unbanUser(
 	userArray: Array<user>
 ) {
 	if (command.length != 2) {
-		smsAPI.sendSms(phoneNumber, 'Syntax: unban <number>');
+		smsAPI.sendNewMessage('Syntax: unban <number>', phoneNumber);
 		return;
 	}
 	const admin = getAdminByPhoneNumber(adminArray, phoneNumber);
 	if (typeof admin == 'undefined') {
-		smsAPI.sendSms(phoneNumber, 'Error in finding admin');
+		smsAPI.sendNewMessage('Error in finding admin', phoneNumber);
 		return;
 	}
 	if (!isUserPhoneNumber(userArray, command[1])) {
@@ -165,7 +165,7 @@ total = ${parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now()
 					console.log('[' + chalk.red('Error') + '] No user found : ' + phoneNumber);
 				}
 			} else {
-				smsAPI.sendSms(phoneNumber, pingMessage);
+				smsAPI.sendNewMessage(pingMessage, phoneNumber);
 			}
 		}
 		console.log(`[${chalk.green('Success command')}] ` + removeAll(pingMessage, '\n', ' '));
@@ -174,7 +174,6 @@ total = ${parseInt(req.body.pingSms.replace('.0', '')) + parseFloat(((Date.now()
 
 function pingProg(
 	phoneNumber: string,
-	req: any,
 	internal: number,
 	smsAPI: sms,
 	adminArray: Array<admin>,
@@ -195,7 +194,7 @@ internal ping [${Date.now() - internal}ms]`;
 				console.log('[' + chalk.red('Error') + '] No user found : ' + phoneNumber);
 			}
 		} else {
-			smsAPI.sendSms(phoneNumber, pingMessage);
+			smsAPI.sendNewMessage(phoneNumber, pingMessage);
 		}
 	}
 	console.log(`[${chalk.green('Success command')}] ` + removeAll(pingMessage, '\n', ' '));
@@ -203,9 +202,9 @@ internal ping [${Date.now() - internal}ms]`;
 
 function restart(phoneNumber: string, llamaAPI: llama, smsAPI: sms) {
 	console.log('[' + chalk.green('Success command') + '] Restarting system...');
-	smsAPI.sendSms(phoneNumber, 'Restarting system...');
+	smsAPI.sendNewMessage(phoneNumber, 'Restarting system...');
 	llamaAPI.restart(() => {
-		smsAPI.sendSms(phoneNumber, 'restart completed');
+		smsAPI.sendNewMessage(phoneNumber, 'restart completed');
 		console.log('[' + chalk.green('Success command') + '] System restarted!');
 	});
 }

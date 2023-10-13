@@ -17,7 +17,7 @@ export default class admin {
 
 	sendMessage(message: string, smsAPI: sms) {
 		this.sendHistory.push(message);
-		smsAPI.sendSms(this.phoneNumber, message);
+		smsAPI.sendNewMessage(this.phoneNumber, message);
 		this.save();
 	}
 
