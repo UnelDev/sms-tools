@@ -8,18 +8,18 @@ export default class llama {
 	request: Array<[string, (response: string) => void]>;
 	started: boolean;
 	onStart: Function;
+	path: string;
 
 	constructor(onStart: Function) {
+		this.path =
+			'/opt/llama.cpp/main -m /opt/llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f /opt/llama.cpp/prompts/chat-with-bob.txt';
 		this.computing = false;
 		this.request = [];
 		this.message = '';
 		this.started = false;
-		this.childProcess = spawn(
-			'/opt/llama.cpp/main -m /opt/llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f /opt/llama.cpp/prompts/chat-with-bob.txt',
-			{
-				shell: true
-			}
-		);
+		this.childProcess = spawn(this.path, {
+			shell: true
+		});
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
@@ -27,7 +27,6 @@ export default class llama {
 			console.log('[' + chalk.red('model error') + '] llama close with code:' + code);
 		});
 		this.onStart = onStart;
-
 		const outputStream = this.childProcess.stdout;
 		outputStream.on('data', data => {
 			this.answer(data);
@@ -47,12 +46,9 @@ export default class llama {
 		this.message = '';
 		this.computing = false;
 		this.request = [];
-		this.childProcess = spawn(
-			'/opt/llama.cpp/main -m /opt/llama.cpp/models/llama-7b/ggml-model-q4_0.gguf -c 512 -b 1024 -n 256 --keep 48 --repeat-penalty 1.0 -i -r "User:" -f /opt/llama.cpp/prompts/chat-with-bob.txt',
-			{
-				shell: true
-			}
-		);
+		this.childProcess = spawn(this.path, {
+			shell: true
+		});
 		this.childProcess.on('error', error => {
 			console.error('[' + chalk.red('model error') + ']: ' + error);
 		});
