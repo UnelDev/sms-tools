@@ -45,7 +45,9 @@ class allInSmsClient {
 				}
 			})
 			.catch(err => errorCallback(err));
+		express();
 	}
+
 	express() {
 		this.expressServer.get('/ping', (req: any, res: any) => {
 			res.send('pong');
