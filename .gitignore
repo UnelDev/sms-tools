@@ -2,3 +2,4 @@ node_modules/
 datas/
 *.env
 .http
+*.log
