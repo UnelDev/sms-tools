@@ -3,11 +3,12 @@ import { spawn } from 'child_process';
 
 export default class llama {
 	message: string;
-	childProcess: import('child_process').ChildProcessWithoutNullStreams;
-	computing: boolean;
-	request: Array<[string, (response: string) => void]>;
+	private childProcess: import('child_process').ChildProcessWithoutNullStreams;
+	private computing: boolean;
+	private request: Array<[string, (response: string) => void]>;
 	started: boolean;
-	onStart: Function;
+	private onStart: Function;
+	private lastData: NodeJS.Timeout | undefined;
 
 	constructor(onStart: Function) {
 		this.computing = false;
@@ -76,6 +77,27 @@ export default class llama {
 		this.childProcess.stdin.write('');
 	}
 
+	private answerThrow() {
+		this.message = this.message + '\nUser:';
+		this.answerResolve();
+	}
+
+	private answerResolve() {
+		const ArrayOfMessage = this.message.split('\n');
+		if (ArrayOfMessage.length < 2) {
+			console.log('error in lenght of arrayMessage');
+		}
+		const readeableMessage = ArrayOfMessage[ArrayOfMessage.length - 2]
+			.replace('User:Bob: ', '')
+			.replace('Bob:', '')
+			.replace('User:', '');
+		this.request[0][1](readeableMessage);
+		this.request.shift();
+		if (this.request.length == 0) this.computing = false;
+		if (typeof this.lastData != undefined) clearTimeout(this.lastData);
+		this.compute();
+	}
+
 	private answer(data: any) {
 		this.message += data.toString();
 		const ArrayOfMessage = this.message.split('\n');
@@ -86,18 +108,7 @@ export default class llama {
 			}
 		}
 		if (!this.computing) return;
-		if (this.message.endsWith('User:')) {
-			if (ArrayOfMessage.length < 2) {
-				console.log('error');
-			}
-			const readeableMessage = ArrayOfMessage[ArrayOfMessage.length - 2]
-				.replace('User:Bob: ', '')
-				.replace('Bob:', '')
-				.replace('User:', '');
-			this.request[0][1](readeableMessage);
-			this.request.shift();
-			if (this.request.length == 0) this.computing = false;
-			this.compute();
-		}
+		this.lastData = setTimeout(() => this.answerThrow.bind(this), 5_000);
+		if (this.message.endsWith('User:')) this.answerResolve();
 	}
 }
