@@ -1,6 +1,5 @@
 import fs from 'fs';
-
-import sms from './smsSender';
+import sendSms from './smsSender';
 
 export default class admin {
 	phoneNumber: string;
@@ -15,9 +14,9 @@ export default class admin {
 		this.save();
 	}
 
-	sendMessage(message: string, smsAPI: sms) {
+	sendMessage(message: string) {
 		this.sendHistory.push(message);
-		smsAPI.sendSms(this.phoneNumber, message);
+		sendSms(this.phoneNumber, message);
 		this.save();
 	}
 

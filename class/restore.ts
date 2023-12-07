@@ -9,7 +9,6 @@ function restoreUsersFromFile(): Array<user> {
 		return userData.map(userData => {
 			const restoredUser = new user(
 				userData.phoneNumber,
-				userData.firstMessage,
 				userData.receviedHistory,
 				userData.sendHistory,
 				userData.isBan,
