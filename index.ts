@@ -1,20 +1,18 @@
 import chalk from 'chalk';
 import express from 'express';
+import { config } from 'dotenv';
+config();
 
 import { IsPhoneNumber, removeAll, removeEmoji } from './Utils';
 import admin from './class/admin';
 import llama from './class/llama';
 import { restoreUsersFromFile, restoreadminFromFile } from './class/restore';
-import sms from './class/smsSender';
 import user from './class/user';
 import command from './command';
+import sendSms from './class/smsSender';
 
 async function main() {
 	console.log('starting...');
-	const smsAPI = new sms();
-	if (!smsAPI) {
-		return;
-	}
 	let userArray: Array<user> = restoreUsersFromFile();
 	let adminArray: Array<admin> = restoreadminFromFile();
 	const llamaAPI = await new Promise<llama>(resolve => {
@@ -57,29 +55,25 @@ async function main() {
 		if (message.startsWith(prefix)) {
 			message = message.replace(prefix, '');
 			console.log('[' + chalk.yellow('COMMAND') + "] '" + chalk.bold(phoneNumber) + "': " + message);
-			command(message, phoneNumber, req, Date.now(), smsAPI, llamaAPI, adminArray, userArray, curentHistory);
+			command(message, phoneNumber, req, Date.now(), llamaAPI, adminArray, userArray, curentHistory);
 		} else {
-			ProcessMessage(phoneNumber, userArray, curentHistory, message, smsAPI, llamaAPI);
+			ProcessMessage(phoneNumber, userArray, curentHistory, message, llamaAPI);
 		}
 	});
 }
-
-console.clear();
-main();
 
 function ProcessMessage(
 	phoneNumber: any,
 	userArray: user[],
 	curentHistory: [Date, string, string][],
 	message: string,
-	smsAPI: sms,
 	llamaAPI: llama
 ) {
 	process.stdout.write('[' + chalk.blue('MESSAGE') + "] '" + chalk.bold(phoneNumber) + "': ");
 
-	const targetUser = userArray.find(Element => Element.phoneNumber == phoneNumber);
+	let targetUser = userArray.find(Element => Element.phoneNumber == phoneNumber);
 	if (typeof targetUser == 'undefined') {
-		targetUser == new user(phoneNumber);
+		targetUser = new user(phoneNumber);
 	}
 
 	if (
@@ -87,13 +81,15 @@ function ProcessMessage(
 		curentHistory[curentHistory.length - 1][1] == targetUser.phoneNumber ||
 		message.includes('.bypass')
 	) {
-		targetUser.newMessage(message, smsAPI, llamaAPI, curentHistory);
+		targetUser.newMessage(message, llamaAPI, curentHistory);
 	} else {
 		targetUser.sendMessage(
 			'Bob\'s already talking to someone. Add ".bypass" before your message to bypass this security.\n Last message sent ' +
 				(new Date().getTime() - curentHistory[curentHistory.length - 1][0].getTime()) / 1000 +
-				's ago.',
-			smsAPI
+				's ago.'
 		);
 	}
 }
+
+console.clear();
+main();
