@@ -1,6 +1,5 @@
 import axios from 'axios';
 async function sendSms(phoneNumber: string, message: string) {
-	// console.log(message);
 	const phoneArray = phoneNumber.split('');
 	if (phoneArray[0] == '0') {
 		phoneArray.shift();
