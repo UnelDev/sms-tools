@@ -11,7 +11,7 @@ class llamaServer extends Service {
 		this.name = 'llama one';
 		this.model = [
 			new Model('monaGpt', '/opt/llama.cpp/server', 8081),
-			new Model('meta llama', '/opt/llama.cpp/server', 8082)
+			new Model('meta_llama', '/opt/llama.cpp/server', 8082)
 		];
 	}
 	newAction(user: User, message: string) {

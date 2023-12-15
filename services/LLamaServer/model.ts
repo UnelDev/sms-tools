@@ -14,7 +14,7 @@ class Model {
 	}
 	start() {
 		this.child = exec(
-			this.path + ' -m /opt/llama.cpp/models/llama-7b/monadgpt.Q4_0.gguf -c 2048 --port ' + this.port.toString()
+			this.path + ' -m /opt/llama.cpp/models/' + this.name + '.gguf -c 2048 --port ' + this.port.toString()
 		);
 		const p = new Promise(resolve => {
 			this.child.stdout.on('data', (data: Buffer) => {
