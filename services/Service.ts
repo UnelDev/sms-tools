@@ -3,9 +3,9 @@ import User from '../user/User';
 
 class Service {
 	name: string = 'null';
-	block: boolean = false;
+	lock: boolean = false;
 	conflic: Array<string> = []; // no effect if start == false
-	started: boolean = false; // no effect if block == false
+	started: boolean = false; // no effect if lock == false
 	constructor() {}
 	newAction(user: User, message: string) {
 		sendSms(user.phoneNumber, 'hello, you have send ' + message);

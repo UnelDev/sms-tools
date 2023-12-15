@@ -15,9 +15,9 @@ class Util extends service {
 			sendSms(
 				user.phoneNumber,
 				`you have selected ${bolderize('Util')} servces. list of command: %0a
-				 ping: reply pong%0a%0a
+				${bolderize('ping')}: reply pong%0a%0a
 				 
-				 home: go to main menu`
+				${bolderize('home')}: go to main menu`
 			);
 		}
 	}

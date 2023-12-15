@@ -1,3 +1,4 @@
+import llamaServer from './services/LLamaServer/LlamaServer';
 import Service from './services/Service';
 import util from './services/Util';
 import sendSms from './tools/sendSms';
@@ -9,6 +10,7 @@ class Switchboard {
 	private users: Array<User> = [];
 	constructor() {
 		this.services.push(new util());
+		this.services.push(new llamaServer());
 	}
 	main(phoneNumber: string, message: string) {
 		message = message.toLowerCase();
@@ -19,7 +21,7 @@ class Switchboard {
 			const tmpUrs = findUserByPhone(this.users, phoneNumber);
 			if (typeof tmpUrs.activeService != 'undefined') {
 				//user with service
-				if (message == 'home') {
+				if (message.split(' ')[0] == 'home') {
 					tmpUrs.activeService = undefined;
 					message = message.replace('home', '');
 					message = message.trim();
@@ -41,7 +43,7 @@ class Switchboard {
 		let serviceList = '';
 		this.services.forEach((el, i) => {
 			let extra = '';
-			if (el.block) {
+			if (el.lock) {
 				extra = '(locked)';
 			}
 			if (this.detectConflicts(el)) {
