@@ -4,7 +4,7 @@ import sendSms from '../../tools/sendSms';
 class Model {
 	name: string;
 	path: string;
-	childProcess: ChildProcessWithoutNullStreams;
+	child: ChildProcessWithoutNullStreams;
 	started: boolean = false;
 	port: number;
 	constructor(name: string, path: string, port: number) {
@@ -13,11 +13,11 @@ class Model {
 		this.port = port;
 	}
 	start() {
-		const mod = exec(
+		this.child = exec(
 			this.path + ' -m /opt/llama.cpp/models/llama-7b/monadgpt.Q4_0.gguf -c 2048 --port ' + this.port.toString()
 		);
 		const p = new Promise(resolve => {
-			mod.stdout.on('data', (data: Buffer) => {
+			this.child.stdout.on('data', (data: Buffer) => {
 				if (data.toString().includes('HTTP server listening')) {
 					resolve(true);
 					this.started = true;
@@ -25,7 +25,7 @@ class Model {
 			});
 		});
 
-		mod.on('close', code => {
+		this.child.on('close', code => {
 			this.started = false;
 			console.log('Llama closed');
 		});
@@ -40,6 +40,8 @@ class Model {
 		const res = axios.post('http://127.0.0.1:' + this.port + '/completion', { prompt: message, n_predict: 512 });
 		sendSms(phoneNumber, (await res).data.content);
 	}
+
+	close() {}
 }
 
 export default Model;

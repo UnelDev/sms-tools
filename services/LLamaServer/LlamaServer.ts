@@ -16,7 +16,7 @@ class llamaServer extends Service {
 	}
 	newAction(user: User, message: string) {
 		if (typeof user.otherInfo.get('LlamaServer_modelNumber') == 'number') {
-			this.model[user.otherInfo.get('LlamaServer_modelNumber')].message(user.phoneNumber, message);
+			this.newQuestion(user, message);
 			return;
 		}
 		const modelNumber = parseInt(message.split(' ')[0]);
@@ -35,7 +35,18 @@ class llamaServer extends Service {
 		sendSms(user.phoneNumber, `Please select your model: ${modelList}%0a%0a${bolderize('home')}: go to main menu`);
 	}
 
-	modelStarting(reqUser: User, modelNumber: number) {
+	private newQuestion(reqUser: User, message: string) {
+		this.model[reqUser.otherInfo.get('LlamaServer_modelNumber')].message(reqUser.phoneNumber, message);
+		clearTimeout(reqUser.otherInfo.get('LlamaServer_closeTimer'));
+		reqUser.otherInfo.set(
+			'LlamaServer_closeTimer',
+			setTimeout(() => {
+				this.model[reqUser.otherInfo.get('LlamaServer_modelNumber')].close();
+			}, 300_000)
+		);
+	}
+
+	private modelStarting(reqUser: User, modelNumber: number) {
 		this.model[modelNumber].start().then(() => this.modelStarted(reqUser, modelNumber));
 		sendSms(
 			reqUser.phoneNumber,
@@ -43,8 +54,14 @@ class llamaServer extends Service {
 		);
 	}
 
-	modelStarted(reqUser: User, modelNumber: number) {
+	private modelStarted(reqUser: User, modelNumber: number) {
 		reqUser.otherInfo.set('LlamaServer_modelNumber', modelNumber);
+		reqUser.otherInfo.set(
+			'LlamaServer_closeTimer',
+			setTimeout(() => {
+				this.model[modelNumber].close();
+			}, 300_000)
+		);
 
 		sendSms(
 			reqUser.phoneNumber,
