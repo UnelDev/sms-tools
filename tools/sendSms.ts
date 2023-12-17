@@ -11,6 +11,7 @@ async function sendSms(phoneNumber: string, message: string) {
 		console.log('bad phoneNumber: ' + phoneNumber);
 		return;
 	}
+	console.log({ phoneNumber, message });
 	const res = await axios.post(`http://${process.env.PHONE_IP}/send?message=${message}&phoneno=%2B${phoneNumber}`);
 	if (res?.data?.body?.success != true && typeof res?.data?.body?.success == undefined) {
 		console.log('send error: ' + res?.data?.body?.message);

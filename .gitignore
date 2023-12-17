@@ -3,3 +3,4 @@ datas/
 *.env
 .http
 *.log
+services/LLamaServer/config.json

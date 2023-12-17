@@ -1,8 +1,8 @@
 import express from 'express';
 import chalk from 'chalk';
-
 const app = express();
 app.use(express.json());
+
 import { config } from 'dotenv';
 import { IsPhoneNumber } from './tools/tools';
 import Switchboard from './Switchboard';
