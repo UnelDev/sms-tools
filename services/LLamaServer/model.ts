@@ -1,4 +1,4 @@
-import { exec, ChildProcessWithoutNullStreams } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import sendSms from '../../tools/sendSms';
 import chat_completion from './competion';
 import User from '../../user/User';
@@ -16,18 +16,27 @@ class Model {
 	}
 	start(userTalk: User) {
 		this.userTalk = userTalk;
-		console.log(
-			this.path + ' -m /opt/llama.cpp/models/' + this.name + '.gguf -c 2048 --port ' + this.port.toString()
+		this.child = spawn(
+			this.path,
+			['-m', '/opt/llama.cpp/models/' + this.name + '.gguf', '-c', '2048', '--port', this.port.toString()],
+			{ detached: false }
 		);
-		this.child = exec(
-			this.path + ' -m /opt/llama.cpp/models/' + this.name + '.gguf -c 2048 --port ' + this.port.toString()
-		);
+
 		const p = new Promise(resolve => {
+			let buffer = '';
+
 			this.child.stdout.on('data', (data: Buffer) => {
-				if (data.toString().includes('HTTP server listening')) {
-					resolve(true);
-					this.started = true;
-				}
+				buffer += data.toString('utf-8');
+
+				const lines = buffer.split('\n');
+				buffer = lines.pop();
+
+				lines.forEach(line => {
+					if (line.includes('HTTP server listening')) {
+						resolve(true);
+						this.started = true;
+					}
+				});
 			});
 		});
 
@@ -36,6 +45,7 @@ class Model {
 			this.started = false;
 			console.log('Llama closed');
 		});
+
 		return p;
 	}
 
@@ -53,6 +63,7 @@ class Model {
 	}
 
 	close() {
+		console.log(this.name + 'close ');
 		this.child.kill('SIGABRT');
 		this.userTalk.otherInfo.set('LlamaServer_closeTimer', undefined);
 		this.userTalk.otherInfo.set('LlamaServer_modelNumber', undefined);
