@@ -23,6 +23,7 @@ class Switchboard {
 				//user with service
 				if (message.split(' ')[0] == 'home') {
 					tmpUrs.activeService = undefined;
+					tmpUrs.otherInfo = new Map();
 					message = message.replace('home', '');
 					message = message.trim();
 				} else {
