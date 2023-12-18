@@ -10,16 +10,17 @@ class Util extends service {
 	}
 	newAction(user: User, message: string) {
 		if (message == 'ping') {
-			sendSms(user.phoneNumber, 'pong');
+			sendSms(user.phoneNumber, 'Pong!');
 		} else {
 			sendSms(
 				user.phoneNumber,
-				`you have selected ${bolderize('Util')} servces. list of command: %0a
-				${bolderize('ping')}: reply pong%0a%0a
-				 
-				${bolderize('home')}: go to main menu`
+				`You have selected the ${bolderize('Util')} service. List of command: %0a
+				${bolderize('ping')}: Reply pong%0a%0a
+
+				${bolderize('home')}: Go back to the main menu`
 			);
 		}
 	}
 }
+
 export default Util;

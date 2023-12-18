@@ -8,7 +8,7 @@ class Service {
 	started: boolean = false; // no effect if lock == false
 	constructor() {}
 	newAction(user: User, message: string) {
-		sendSms(user.phoneNumber, 'hello, you have send ' + message);
+		sendSms(user.phoneNumber, 'Hello, you sent' + message);
 	}
 }
 

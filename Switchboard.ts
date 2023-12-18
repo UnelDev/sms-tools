@@ -52,7 +52,7 @@ class Switchboard {
 			}
 			serviceList = serviceList.concat(`%0a${i}: ${el.name} ${bolderize(extra)}`);
 		});
-		sendSms(phoneNumber, `select an application: ${serviceList}`);
+		sendSms(phoneNumber, `Select an application: ${serviceList}`);
 	}
 
 	private selectApp(phoneNumber, message) {
