@@ -2,18 +2,21 @@ import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import sendSms from '../../tools/sendSms';
 import chat_completion from './competion';
 import User from '../../user/User';
+
 class Model {
 	name: string;
 	path: string;
-	child: ChildProcessWithoutNullStreams;
+	child: ChildProcessWithoutNullStreams | undefined;
 	started: boolean = false;
 	port: number;
-	userTalk: User;
+	userTalk: User | undefined;
+
 	constructor(name: string, path: string, port: number) {
 		this.name = name;
 		this.path = path;
 		this.port = port;
 	}
+
 	start(userTalk: User) {
 		this.userTalk = userTalk;
 		this.child = spawn(
@@ -25,11 +28,11 @@ class Model {
 		const p = new Promise(resolve => {
 			let buffer = '';
 
-			this.child.stdout.on('data', (data: Buffer) => {
+			this.child?.stdout.on('data', (data: Buffer) => {
 				buffer += data.toString('utf-8');
 
 				const lines = buffer.split('\n');
-				buffer = lines.pop();
+				buffer = lines.pop() as string;
 
 				lines.forEach(line => {
 					if (line.includes('HTTP server listening')) {
@@ -51,7 +54,7 @@ class Model {
 	}
 
 	async message(userTalk: User, message: string) {
-		if (userTalk.phoneNumber != this.userTalk.phoneNumber) {
+		if (userTalk.phoneNumber != this.userTalk?.phoneNumber) {
 			sendSms(userTalk.phoneNumber, 'Error contact Adminisrator: "user talk to another model"');
 			return;
 		}
@@ -60,14 +63,14 @@ class Model {
 			return;
 		}
 		const res = chat_completion(message, 'http://127.0.0.1:' + this.port);
-		sendSms(userTalk.phoneNumber, await res);
+		sendSms(userTalk.phoneNumber, (await res) as string);
 	}
 
 	close() {
 		console.log(this.name + 'close ');
-		this.child.kill('SIGABRT');
-		this.userTalk.otherInfo.set('LlamaServer_closeTimer', undefined);
-		this.userTalk.otherInfo.set('LlamaServer_modelNumber', undefined);
+		this.child?.kill('SIGABRT');
+		this.userTalk?.otherInfo.set('LlamaServer_closeTimer', undefined);
+		this.userTalk?.otherInfo.set('LlamaServer_modelNumber', undefined);
 	}
 }
 

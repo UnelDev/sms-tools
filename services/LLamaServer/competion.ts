@@ -14,7 +14,7 @@ const propOrder = grammarJsonSchemaPropOrder
 	? grammarJsonSchemaPropOrder.split(',').reduce((acc, cur, index) => ({ ...acc, [cur]: index }), {})
 	: {};
 
-let grammar = null;
+let grammar: string | null = null;
 if (grammarJsonSchemaFile) {
 	const schema = JSON.parse(readFileSync(grammarJsonSchemaFile, 'utf-8'));
 	const converter = new SchemaConverter(propOrder);

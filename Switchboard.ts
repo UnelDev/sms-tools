@@ -19,7 +19,7 @@ class Switchboard {
 			this.users.push(new User(phoneNumber));
 		} else {
 			const tmpUrs = findUserByPhone(this.users, phoneNumber);
-			if (typeof tmpUrs.activeService != 'undefined') {
+			if (typeof tmpUrs != 'undefined' && typeof tmpUrs.activeService != 'undefined') {
 				//user with service
 				if (message.split(' ')[0] == 'home') {
 					tmpUrs.activeService = undefined;
@@ -57,6 +57,9 @@ class Switchboard {
 
 	private selectApp(phoneNumber, message) {
 		const tmpUrs = findUserByPhone(this.users, phoneNumber);
+
+		if (typeof tmpUrs == 'undefined') return;
+
 		const serviceNumber = parseInt(message.split(' ')[0]);
 
 		//remove number
