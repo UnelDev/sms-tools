@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
-		"target": "ES6",
-		"lib": ["ES6", "DOM"],
+		"target": "ESNext",
+		"lib": ["ESNext", "DOM"],
 		"allowJs": true,
 		"noImplicitAny": false,
 		"skipLibCheck": true,
@@ -10,7 +10,7 @@
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,
 		"noFallthroughCasesInSwitch": true,
-		"module": "ESNext",
+		"module": "CommonJS",
 		"moduleResolution": "Node",
 		"resolveJsonModule": true,
 		"isolatedModules": true,
