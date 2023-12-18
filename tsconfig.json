@@ -1,8 +1,19 @@
 {
 	"compilerOptions": {
-		"allowSyntheticDefaultImports": true,
+		"target": "ES6",
+		"lib": ["ES6"],
+		"allowJs": true,
+		"noImplicitAny": false,
+		"skipLibCheck": true,
 		"esModuleInterop": true,
-		"moduleResolution": "node",
-		"outDir": "build/code"
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"forceConsistentCasingInFileNames": true,
+		"noFallthroughCasesInSwitch": true,
+		"module": "ESNext",
+		"moduleResolution": "Node",
+		"resolveJsonModule": true,
+		"isolatedModules": true,
+		"noEmit": true
 	}
 }
