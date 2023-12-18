@@ -33,8 +33,9 @@ class Model {
 
 				lines.forEach(line => {
 					if (line.includes('HTTP server listening')) {
-						resolve(true);
 						this.started = true;
+						console.log('llama started');
+						resolve(true);
 					}
 				});
 			});
