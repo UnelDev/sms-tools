@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync } from 'fs';
+
 import { SchemaConverter } from './json-schema-to-grammar';
 
 const args = process.argv.slice(2);

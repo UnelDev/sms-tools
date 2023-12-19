@@ -1,7 +1,8 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+
 import sendSms from '../../tools/sendSms';
-import chat_completion from './competion';
 import User from '../../user/User';
+import chat_completion from './competion';
 
 class Model {
 	name: string;

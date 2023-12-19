@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 async function sendSms(phoneNumber: string, message: string) {
 	const phoneArray = phoneNumber.split('');
 	if (phoneArray[0] == '0') {

@@ -1,9 +1,10 @@
+import fs from 'fs';
+
 import sendSms from '../../tools/sendSms';
 import { bolderize } from '../../tools/tools';
 import User from '../../user/User';
 import Service from '../Service';
 import Model from './model';
-import fs from 'node:fs';
 
 class llamaServer extends Service {
 	model: Array<Model>;

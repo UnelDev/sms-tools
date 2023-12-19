@@ -36,4 +36,4 @@ function findServiceByName(services: Array<Service>, name: string) {
 	return services.find(serv => serv.name == name);
 }
 
-export { bolderize, IsPhoneNumber, findUserByPhone, findServiceByName };
+export { IsPhoneNumber, bolderize, findServiceByName, findUserByPhone };

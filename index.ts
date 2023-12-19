@@ -1,12 +1,13 @@
-import express from 'express';
 import chalk from 'chalk';
+import { config } from 'dotenv';
+import express from 'express';
+
+import Switchboard from './Switchboard';
+import { IsPhoneNumber } from './tools/tools';
+
+config();
 const app = express();
 app.use(express.json());
-
-import { config } from 'dotenv';
-import { IsPhoneNumber } from './tools/tools';
-import Switchboard from './Switchboard';
-config();
 
 const switchboard = new Switchboard();
 

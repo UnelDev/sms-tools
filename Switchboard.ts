@@ -80,4 +80,5 @@ class Switchboard {
 		return this.users.some(usr => usr.phoneNumber == phoneNumber);
 	}
 }
+
 export default Switchboard;
