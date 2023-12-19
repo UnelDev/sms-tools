@@ -30,13 +30,9 @@ app.post('/', async (req, res) => {
 	}
 
 	if (!IsPhoneNumber(phoneNumber)) {
-		console.log(
-			'[' + chalk.red('ERROR') + "] '" + 'recevied message from: ' + chalk.bold(phoneNumber) + "': " + message
-		);
+		console.log(`[${chalk.red('ERROR')}] Received message from: ${chalk.bold(phoneNumber)}: ${message}`);
 		return;
 	}
-	console.log(
-		'[' + chalk.blue('INFO') + "] '" + 'recevied message from: ' + chalk.bold(phoneNumber) + "': " + message
-	);
+	console.log(`[${chalk.blue('INFO')}] Received message from: ${chalk.bold(phoneNumber)}: ${message}`);
 	switchboard.main(phoneNumber, message);
 });
