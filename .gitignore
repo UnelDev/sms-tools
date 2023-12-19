@@ -1,6 +1,8 @@
 node_modules/
 datas/
-*.env
-.http
-*.log
+
 services/LLamaServer/config.json
+
+*.env
+*.http
+*.log
