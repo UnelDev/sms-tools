@@ -1,6 +1,7 @@
 import llamaServer from './services/LLamaServer/LlamaServer';
 import Service from './services/Service';
 import util from './services/Util';
+import Wikipedia from './services/Wikipedia';
 import sendSms from './tools/sendSms';
 import { bolderize, findUserByPhone } from './tools/tools';
 import User from './user/User';
@@ -11,6 +12,7 @@ class Switchboard {
 	constructor() {
 		this.services.push(new util());
 		this.services.push(new llamaServer());
+		this.services.push(new Wikipedia());
 	}
 	main(phoneNumber: string, message: string) {
 		message = message.toLowerCase();

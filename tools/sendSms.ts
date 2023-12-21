@@ -13,9 +13,13 @@ async function sendSms(phoneNumber: string, message: string) {
 		return;
 	}
 	console.log('Sent ' + message + ' at ' + phoneNumber);
-	const res = await axios.post(`http://${process.env.PHONE_IP}/send?message=${message}&phoneno=%2B${phoneNumber}`);
-	if (res?.data?.body?.success != true && typeof res?.data?.body?.success == undefined) {
-		console.log('Send error: ' + res?.data?.body?.message);
+	if (process.env.PROD != 'true') {
+		const res = await axios.post(
+			`http://${process.env.PHONE_IP}/send?message=${message}&phoneno=%2B${phoneNumber}`
+		);
+		if (res?.data?.body?.success != true && typeof res?.data?.body?.success == undefined) {
+			console.log('Send error: ' + res?.data?.body?.message);
+		}
 	}
 }
 
