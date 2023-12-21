@@ -30,9 +30,9 @@ class llamaServer extends Service {
 		}
 		let modelList = '';
 		for (let i = 0; i < this.model.length; i++) {
-			modelList = modelList.concat('%0a' + i + ':' + this.model[i].name);
+			modelList = modelList.concat('\n' + i + ':' + this.model[i].name);
 		}
-		sendSms(user.phoneNumber, `Please select your model: ${modelList}%0a%0a${bolderize('home')}: go to main menu`);
+		sendSms(user.phoneNumber, `Please select your model: ${modelList}\n\n${bolderize('home')}: go to main menu`);
 	}
 
 	private newQuestion(reqUser: User, message: string) {
