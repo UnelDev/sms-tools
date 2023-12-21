@@ -1,6 +1,6 @@
 import axios from 'axios';
+
 async function sendSms(phoneNumber: string, message: string) {
-	// console.log(message);
 	const phoneArray = phoneNumber.split('');
 	if (phoneArray[0] == '0') {
 		phoneArray.shift();
@@ -9,12 +9,13 @@ async function sendSms(phoneNumber: string, message: string) {
 		phoneArray.unshift('+');
 		phoneNumber = phoneArray.join('');
 	} else if (phoneNumber[0] != '+') {
-		console.log('bad phoneNumber: ' + phoneNumber);
+		console.log('Bad phoneNumber: ' + phoneNumber);
 		return;
 	}
+	console.log('Sent ' + message + ' at ' + phoneNumber);
 	const res = await axios.post(`http://${process.env.PHONE_IP}/send?message=${message}&phoneno=%2B${phoneNumber}`);
 	if (res?.data?.body?.success != true && typeof res?.data?.body?.success == undefined) {
-		console.log('send error: ' + res?.data?.body?.message);
+		console.log('Send error: ' + res?.data?.body?.message);
 	}
 }
 
