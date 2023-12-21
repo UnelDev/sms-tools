@@ -15,9 +15,10 @@ class Wikipedia extends Service {
 			this.event(user, message);
 		} else {
 			user.sendMessage(
-				`You have selected the ${bolderize('wikipedia')} service. List of command: %0a
-				${bolderize('event')}: reply by all event which happened on this date%0a%0a
-				${bolderize('home')}: Go back to the main menu`
+				`You have selected the ${bolderize('wikipedia')} service. List of command:
+${bolderize('event')}: reply by all event which happened on this date
+
+${bolderize('home')}: Go back to the main menu`
 			);
 		}
 	}
@@ -38,22 +39,20 @@ class Wikipedia extends Service {
 					return;
 				} else {
 					user.sendMessage(
-						bolderize(events.selected[target].year?.toString() ?? 'xxxx') +
-							'%0a' +
-							events.selected[target].text +
-							'%0aAttached links:' +
-							crearteLinkList(events.selected[target].pages) +
-							`%0aPage [${target}/${events.selected.length - 1}]`
+						`${bolderize(events.selected[target].year?.toString() ?? 'xxxx')}\n${
+							events.selected[target].text
+						}\nAttached links:${crearteLinkList(events.selected[target].pages)}\nPage [${target}/${
+							events.selected.length - 1
+						}]`
 					);
 				}
 			} else {
 				user.sendMessage(
-					bolderize(events.selected[0].year?.toString() ?? 'xxxx') +
-						'%0a' +
-						events.selected[0].text +
-						'%0a%0aAttached links:' +
-						crearteLinkList(events.selected[0].pages) +
-						`%0aPage [0/${events.selected.length - 1}]`
+					`${bolderize(events.selected[0].year?.toString() ?? 'xxxx')}\n${
+						events.selected[0].text
+					}\nAttached links:${crearteLinkList(events.selected[0].pages)}\nPage [${0}/${
+						events.selected.length - 1
+					}]`
 				);
 			}
 		} catch (error) {
@@ -62,7 +61,7 @@ class Wikipedia extends Service {
 		}
 		function crearteLinkList(page: wikiSummary[]) {
 			return page.map(el => {
-				return '%0a' + el.normalizedtitle + ': ' + el.content_urls.mobile.page;
+				return '\n' + el.normalizedtitle + ': ' + el.content_urls.mobile.page;
 			});
 		}
 	}
