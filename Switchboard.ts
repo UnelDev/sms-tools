@@ -52,7 +52,7 @@ class Switchboard {
 			if (this.detectConflicts(el)) {
 				extra = extra.concat('(conflict)');
 			}
-			serviceList = serviceList.concat(`%0a${i}: ${el.name} ${bolderize(extra)}`);
+			serviceList = serviceList.concat(`\n${i}: ${el.name} ${bolderize(extra)}`);
 		});
 		sendSms(phoneNumber, `Select an application: ${serviceList}`);
 	}

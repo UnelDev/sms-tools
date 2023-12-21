@@ -12,6 +12,7 @@ class User {
 	}
 
 	sendMessage(message: string) {
+		message = message.replaceAll('\n', '%0a');
 		sendSms(this.phoneNumber, message);
 	}
 }

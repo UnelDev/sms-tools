@@ -21,9 +21,10 @@ class Util extends service {
 			this.sendAt(user, message);
 		} else {
 			user.sendMessage(
-				`You have selected the ${bolderize('Util')} service. List of command: %0a
-				${bolderize('ping')}: Reply pong%0a
-				${bolderize('sendAt')}: send your message an another person%0a%0a
+				`You have selected the ${bolderize('Util')} service. List of command: 
+				${bolderize('ping')}: Reply pong
+				${bolderize('sendAt')}: send your message an another person
+
 				${bolderize('home')}: Go back to the main menu`
 			);
 		}
@@ -68,13 +69,11 @@ class Util extends service {
 			if (message.trim() != '') {
 				user.otherInfo.set('Util_Message', message.trim());
 				user.sendMessage(
-					'You want to send: "' +
-						message.trim() +
-						'" to the "' +
-						user.otherInfo.get('Util_recPhone') +
-						'this messge will be sent at ' +
-						user.otherInfo.get('Util_date').toLocaleString('en-GB') +
-						'.%0ay/n'
+					`You want to send: "${message.trim()}" 
+to the "${user.otherInfo.get('Util_recPhone')}" 
+this messge will be sent at ${user.otherInfo.get('Util_date').toLocaleString('en-GB')}
+
+y/n`
 				);
 			} else {
 				user.sendMessage('give me the message');
@@ -90,13 +89,13 @@ class Util extends service {
 			if (user.otherInfo.get('Util_date').getTime() - Date.now() < 0) {
 				sendSms(
 					user.otherInfo.get('Util_recPhone'),
-					user.otherInfo.get('Util_Message') + '%0a%0a' + bolderize("message forwarded you can't reply")
+					user.otherInfo.get('Util_Message') + '\n\n' + bolderize("message forwarded you can't reply")
 				);
 			} else {
 				setTimeout(() => {
 					sendSms(
 						user.otherInfo.get('Util_recPhone'),
-						user.otherInfo.get('Util_Message') + '%0a%0a' + bolderize("message forwarded you can't reply")
+						user.otherInfo.get('Util_Message') + '\n\n' + bolderize("message forwarded you can't reply")
 					);
 				}, user.otherInfo.get('Util_date').getTime() - Date.now());
 			}
