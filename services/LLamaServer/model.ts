@@ -31,6 +31,11 @@ class Model {
 			console.log('Model closed (' + code + ')');
 		});
 
+		this.child.on('error', code => {
+			this.started = false;
+			console.log('Model crashed (' + code + ')');
+		});
+
 		return new Promise(resolve => {
 			let buffer = '';
 
