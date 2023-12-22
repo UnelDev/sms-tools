@@ -2,13 +2,14 @@ import llamaServer from './services/LLamaServer/LlamaServer';
 import Service from './services/Service';
 import util from './services/Util';
 import Wikipedia from './services/Wikipedia';
+import restore from './tools/restore';
 import sendSms from './tools/sendSms';
 import { bolderize, findUserByPhone } from './tools/tools';
 import User from './user/User';
 
 class Switchboard {
 	services: Array<Service> = [];
-	private users: Array<User> = [];
+	private users: Array<User> = restore();
 	constructor() {
 		this.services.push(new util());
 		this.services.push(new llamaServer());
