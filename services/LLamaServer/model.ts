@@ -26,7 +26,12 @@ class Model {
 			{ detached: false }
 		);
 
-		const p = new Promise(resolve => {
+		this.child.on('close', code => {
+			this.started = false;
+			console.log('Model closed (' + code + ')');
+		});
+
+		return new Promise(resolve => {
 			let buffer = '';
 
 			this.child?.stdout.on('data', (data: Buffer) => {
@@ -35,22 +40,13 @@ class Model {
 				const lines = buffer.split('\n');
 				buffer = lines.pop() as string;
 
-				lines.forEach(line => {
-					if (line.includes('HTTP server listening')) {
-						this.started = true;
-						console.log('Model ' + this.name + ' started');
-						resolve(true);
-					}
-				});
+				if (lines.find(line => line.includes('HTTP server listening'))) {
+					this.started = true;
+					console.log('Model ' + this.name + ' started');
+					resolve(true);
+				}
 			});
 		});
-
-		this.child.on('close', code => {
-			this.started = false;
-			console.log('Model closed (' + code + ')');
-		});
-
-		return p;
 	}
 
 	async message(userTalk: User, message: string) {
@@ -62,8 +58,7 @@ class Model {
 			sendSms(userTalk.phoneNumber, 'Model non started, wait the message');
 			return;
 		}
-		const res = chat_completion(message, 'http://127.0.0.1:' + this.port);
-		sendSms(userTalk.phoneNumber, (await res) as string);
+		sendSms(userTalk.phoneNumber, (await chat_completion(message, 'http://127.0.0.1:' + this.port)) as string);
 	}
 
 	close() {
