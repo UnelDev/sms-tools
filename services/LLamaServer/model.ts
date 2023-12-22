@@ -35,8 +35,11 @@ class Model {
 
 		this.child.on('error', code => {
 			this.started = false;
-			console.log('[' + chalk.red('ERROR') + '] Model crashed (' + code + ')');
+			console.log('[' + chalk.red('ERROR') + '] Model crashed (' + code.name + ')');
 		});
+
+		// Doesn't work without this
+		this.child.stdout.on('data', () => {});
 
 		return new Promise(resolve => {
 			// Wait 30 seconds before giving up
