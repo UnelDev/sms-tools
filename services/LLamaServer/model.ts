@@ -4,6 +4,7 @@ import waitPort from 'wait-port';
 import sendSms from '../../tools/sendSms';
 import User from '../../user/User';
 import chat_completion from './competion';
+import chalk from 'chalk';
 
 class Model {
 	name: string;
@@ -29,40 +30,26 @@ class Model {
 
 		this.child.on('close', code => {
 			this.started = false;
-			console.log('Model closed (' + code + ')');
+			console.log('[' + chalk.blue('INFO') + '] Model closed (' + code + ')');
 		});
 
 		this.child.on('error', code => {
 			this.started = false;
-			console.log('Model crashed (' + code + ')');
+			console.log('[' + chalk.red('ERROR') + '] Model crashed (' + code + ')');
 		});
 
 		return new Promise(resolve => {
 			// Wait 30 seconds before giving up
 			waitPort({ host: '127.0.0.1', port: this.port, timeout: 30_000, output: 'silent' }).then(result => {
 				if (result.open) {
-					console.log('Model ' + this.name + ' started');
+					console.log('[' + chalk.blue('INFO') + '] Model ' + this.name + ' started');
 					this.started = true;
 					resolve(true);
 				} else {
-					console.log("The model didn't start");
+					console.log('[' + chalk.red('ERROR') + "] The model didn't start");
 					resolve(false);
 				}
 			});
-			//let buffer = '';
-
-			//this.child?.stdout.on('data', (data: Buffer) => {
-			//	buffer += data.toString('utf-8');
-
-			//	const lines = buffer.split('\n');
-			//	buffer = lines.pop() as string;
-
-			//	if (lines.find(line => line.includes('HTTP server listening'))) {
-			//		this.started = true;
-			//		console.log('Model ' + this.name + ' started');
-			//		resolve(true);
-			//	}
-			//});
 		});
 	}
 

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import chalk from 'chalk';
 
 async function sendSms(phoneNumber: string, message: string) {
 	const phoneArray = phoneNumber.split('');
@@ -9,13 +10,13 @@ async function sendSms(phoneNumber: string, message: string) {
 		phoneArray.unshift('+');
 		phoneNumber = phoneArray.join('');
 	} else if (phoneNumber[0] != '+') {
-		console.log('Bad phoneNumber: ' + phoneNumber);
+		console.log('[' + chalk.red('ERROR') + '] Bad phoneNumber: ' + phoneNumber);
 		return;
 	}
-	console.log('Sent ' + message + ' at ' + phoneNumber);
+	console.log(`[>${chalk.green(phoneNumber)}>] ${message}`);
 	const res = await axios.post(`http://${process.env.PHONE_IP}/send?message=${message}&phoneno=%2B${phoneNumber}`);
 	if (res?.data?.body?.success != true && typeof res?.data?.body?.success == undefined) {
-		console.log('Send error: ' + res?.data?.body?.message);
+		console.log('[' + chalk.red('ERROR') + '] Sending: ' + res?.data?.body?.message);
 	}
 }
 
