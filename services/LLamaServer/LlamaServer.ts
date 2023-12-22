@@ -22,17 +22,18 @@ class llamaServer extends Service {
 		const modelNumber = parseInt(message.split(' ')[0]);
 		if (!isNaN(modelNumber) && modelNumber >= 0 && modelNumber < this.model.length) {
 			if (this.model[modelNumber].started) {
-				sendSms(user.phoneNumber, 'Sory this model is alredy use, try later.');
+				sendSms(user.phoneNumber, 'This model is already used. Please try again later.');
 				return;
 			}
 			this.modelStarting(user, modelNumber);
 			return;
 		}
-		let modelList = '';
-		for (let i = 0; i < this.model.length; i++) {
-			modelList = modelList.concat('\n' + i + ':' + this.model[i].name);
-		}
-		sendSms(user.phoneNumber, `Please select your model: ${modelList}\n\n${bolderize('home')}: go to main menu`);
+		const modelList = this.model
+			.map((value, i) => {
+				return `\n${i}: ` + value.name;
+			})
+			.join('');
+		sendSms(user.phoneNumber, `Select your model: ${modelList}\n\n${bolderize('home')}: Go to main menu`);
 	}
 
 	private newQuestion(reqUser: User, message: string) {
@@ -65,7 +66,7 @@ class llamaServer extends Service {
 
 		sendSms(
 			reqUser.phoneNumber,
-			`Model started, you can talk to him. If you don't talk to him for 5 minutes the model will be closed.`
+			"Model started, you can talk to him. If you don't talk to him for 5 minutes the model will be closed."
 		);
 	}
 

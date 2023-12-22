@@ -38,7 +38,7 @@ class Model {
 				lines.forEach(line => {
 					if (line.includes('HTTP server listening')) {
 						this.started = true;
-						console.log('llama started');
+						console.log('Model started');
 						resolve(true);
 					}
 				});
@@ -46,9 +46,8 @@ class Model {
 		});
 
 		this.child.on('close', code => {
-			console.log(code);
 			this.started = false;
-			console.log('Llama closed');
+			console.log('Model closed (' + code + ')');
 		});
 
 		return p;
@@ -56,7 +55,7 @@ class Model {
 
 	async message(userTalk: User, message: string) {
 		if (userTalk.phoneNumber != this.userTalk?.phoneNumber) {
-			sendSms(userTalk.phoneNumber, 'Error contact Adminisrator: "user talk to another model"');
+			sendSms(userTalk.phoneNumber, 'Error: "User talk to another model"');
 			return;
 		}
 		if (!this.started) {
@@ -68,7 +67,7 @@ class Model {
 	}
 
 	close() {
-		console.log(this.name + 'close ');
+		console.log(this.name + ' closed');
 		this.child?.kill('SIGABRT');
 		this.userTalk?.otherInfo.set('LlamaServer_closeTimer', undefined);
 		this.userTalk?.otherInfo.set('LlamaServer_modelNumber', undefined);
