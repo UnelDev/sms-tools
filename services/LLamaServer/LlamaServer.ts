@@ -51,7 +51,11 @@ class llamaServer extends Service {
 			reqUser.phoneNumber,
 			`Model ${this.models[modelNumber].name} starting up. ${bolderize('Wait')} for a new message.`
 		);
-		this.models[modelNumber].start(reqUser).then(() => {
+		this.models[modelNumber].start(reqUser).then(state => {
+			if (!state) {
+				sendSms(reqUser.phoneNumber, "An error occured, the model didn't start.");
+				return;
+			}
 			reqUser.otherInfo.set('LlamaServer_modelNumber', modelNumber);
 			reqUser.otherInfo.set(
 				'LlamaServer_closeTimer',

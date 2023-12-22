@@ -1,4 +1,5 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import waitPort from 'wait-port';
 
 import sendSms from '../../tools/sendSms';
 import User from '../../user/User';
@@ -37,21 +38,31 @@ class Model {
 		});
 
 		return new Promise(resolve => {
-			let buffer = '';
-
-			this.child?.stdout.on('data', (data: Buffer) => {
-				buffer += data.toString('utf-8');
-
-				const lines = buffer.split('\n');
-				buffer = lines.pop() as string;
-				console.log(lines);
-
-				if (lines.find(line => line.includes('HTTP server listening'))) {
-					this.started = true;
+			// Wait 30 seconds before giving up
+			waitPort({ host: '127.0.0.1', port: this.port, timeout: 30_000, output: 'silent' }).then(result => {
+				if (result.open) {
 					console.log('Model ' + this.name + ' started');
+					this.started = true;
 					resolve(true);
+				} else {
+					console.log("The model didn't start");
+					resolve(false);
 				}
 			});
+			//let buffer = '';
+
+			//this.child?.stdout.on('data', (data: Buffer) => {
+			//	buffer += data.toString('utf-8');
+
+			//	const lines = buffer.split('\n');
+			//	buffer = lines.pop() as string;
+
+			//	if (lines.find(line => line.includes('HTTP server listening'))) {
+			//		this.started = true;
+			//		console.log('Model ' + this.name + ' started');
+			//		resolve(true);
+			//	}
+			//});
 		});
 	}
 
