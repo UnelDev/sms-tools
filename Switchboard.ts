@@ -43,21 +43,22 @@ class Switchboard {
 			this.selectApp(phoneNumber, message);
 			return;
 		}
-		let serviceList = '';
-		this.services.forEach((el, i) => {
-			let extra = '';
-			if (el.lock) {
-				extra = '(locked)';
-			}
-			if (this.detectConflicts(el)) {
-				extra = extra.concat('(conflict)');
-			}
-			serviceList = serviceList.concat(`\n${i}: ${el.name} ${bolderize(extra)}`);
-		});
+		const serviceList = this.services
+			.map((service, i) => {
+				let options = '';
+				if (service.lock) {
+					options = '(locked)';
+				}
+				if (this.detectConflicts(service)) {
+					options += '(conflict)';
+				}
+				return '\n' + i + ': ' + service.name + ' ' + bolderize(options);
+			})
+			.join('');
 		sendSms(phoneNumber, `Select an application: ${serviceList}`);
 	}
 
-	private selectApp(phoneNumber, message) {
+	private selectApp(phoneNumber: string, message: string) {
 		const tmpUrs = findUserByPhone(this.users, phoneNumber);
 
 		if (typeof tmpUrs == 'undefined') return;
@@ -74,11 +75,11 @@ class Switchboard {
 		tmpUrs.activeService = this.services[serviceNumber];
 	}
 
-	private detectConflicts(currentService: Service): boolean {
+	private detectConflicts(currentService: Service) {
 		return this.services.some(el => el.started && currentService.conflic.includes(el.name));
 	}
 
-	private isActivePhone(phoneNumber: string): boolean {
+	private isActivePhone(phoneNumber: string) {
 		return this.users.some(usr => usr.phoneNumber == phoneNumber);
 	}
 }

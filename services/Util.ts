@@ -21,11 +21,11 @@ class Util extends service {
 			this.sendAt(user, message);
 		} else {
 			user.sendMessage(
-				`You have selected the ${bolderize('Util')} service. List of command: 
-				${bolderize('ping')}: Reply pong
-				${bolderize('sendAt')}: send your message an another person
+				`You have selected the ${bolderize('Util')} service. List of command:
+${bolderize('ping')}: Reply pong
+${bolderize('sendAt')}: Send a message to someone
 
-				${bolderize('home')}: Go back to the main menu`
+${bolderize('home')}: Go back to the main menu`
 			);
 		}
 	}
@@ -38,7 +38,7 @@ class Util extends service {
 				messageSplit.shift();
 				message = messageSplit.join(' ');
 			} else {
-				user.sendMessage('Send me the phone number of the recipient');
+				user.sendMessage('Send the phone number of the recipient');
 				return;
 			}
 		}
@@ -69,14 +69,14 @@ class Util extends service {
 			if (message.trim() != '') {
 				user.otherInfo.set('Util_Message', message.trim());
 				user.sendMessage(
-					`You want to send: "${message.trim()}" 
-to the "${user.otherInfo.get('Util_recPhone')}" 
+					`You want to send: "${message.trim()}"
+to the "${user.otherInfo.get('Util_recPhone')}"
 this messge will be sent at ${user.otherInfo.get('Util_date').toLocaleString('en-GB')}
 
 y/n`
 				);
 			} else {
-				user.sendMessage('give me the message');
+				user.sendMessage('Send the message');
 				return;
 			}
 
@@ -89,13 +89,15 @@ y/n`
 			if (user.otherInfo.get('Util_date').getTime() - Date.now() < 0) {
 				sendSms(
 					user.otherInfo.get('Util_recPhone'),
-					user.otherInfo.get('Util_Message') + '\n\n' + bolderize("message forwarded you can't reply")
+					user.otherInfo.get('Util_Message') + '\n\n' + bolderize('This message is forwarded. Do not reply')
 				);
 			} else {
 				setTimeout(() => {
 					sendSms(
 						user.otherInfo.get('Util_recPhone'),
-						user.otherInfo.get('Util_Message') + '\n\n' + bolderize("message forwarded you can't reply")
+						user.otherInfo.get('Util_Message') +
+							'\n\n' +
+							bolderize('This message is forwarded. Do not reply')
 					);
 				}, user.otherInfo.get('Util_date').getTime() - Date.now());
 			}
@@ -111,7 +113,6 @@ y/n`
 		const [hours, minutes] = timePart.split(':');
 
 		const isoDateString = `20${year}-${month}-${day} ${hours}:${minutes}`;
-		console.log(isoDateString);
 		const dateObject = new Date(isoDateString);
 
 		if (isNaN(dateObject.getTime())) {

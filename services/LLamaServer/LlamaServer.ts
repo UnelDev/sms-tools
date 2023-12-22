@@ -7,12 +7,11 @@ import Service from '../Service';
 import Model from './model';
 
 class llamaServer extends Service {
-	model: Array<Model>;
+	models: Array<Model>;
 	constructor() {
 		super();
-		this.name = 'llama one';
-		this.model = this.loadConfog();
-		if (this.model == undefined) this.model = [];
+		this.name = 'Llama one';
+		this.models = this.loadConfig() ?? [];
 	}
 	newAction(user: User, message: string) {
 		if (typeof user.otherInfo.get('LlamaServer_modelNumber') == 'number') {
@@ -20,60 +19,61 @@ class llamaServer extends Service {
 			return;
 		}
 		const modelNumber = parseInt(message.split(' ')[0]);
-		if (!isNaN(modelNumber) && modelNumber >= 0 && modelNumber < this.model.length) {
-			if (this.model[modelNumber].started) {
-				sendSms(user.phoneNumber, 'Sory this model is alredy use, try later.');
+		if (!isNaN(modelNumber) && modelNumber >= 0 && modelNumber < this.models.length) {
+			if (this.models[modelNumber].started) {
+				sendSms(user.phoneNumber, 'This model is already used. Please try again later.');
 				return;
 			}
-			this.modelStarting(user, modelNumber);
+			this.startModel(user, modelNumber);
 			return;
 		}
-		let modelList = '';
-		for (let i = 0; i < this.model.length; i++) {
-			modelList = modelList.concat('\n' + i + ':' + this.model[i].name);
-		}
-		sendSms(user.phoneNumber, `Please select your model: ${modelList}\n\n${bolderize('home')}: go to main menu`);
+		const modelList = this.models
+			.map((value, i) => {
+				return `\n${i}: ` + value.name;
+			})
+			.join('');
+		sendSms(user.phoneNumber, `Select your model: ${modelList}\n\n${bolderize('home')}: Go to main menu`);
 	}
 
 	private newQuestion(reqUser: User, message: string) {
-		this.model[reqUser.otherInfo.get('LlamaServer_modelNumber')].message(reqUser, message);
+		this.models[reqUser.otherInfo.get('LlamaServer_modelNumber')].message(reqUser, message);
 		clearTimeout(reqUser.otherInfo.get('LlamaServer_closeTimer'));
 		reqUser.otherInfo.set(
 			'LlamaServer_closeTimer',
 			setTimeout(() => {
-				this.model[reqUser.otherInfo.get('LlamaServer_modelNumber')].close();
+				this.models[reqUser.otherInfo.get('LlamaServer_modelNumber')].close();
 			}, 300_000)
 		);
 	}
 
-	private modelStarting(reqUser: User, modelNumber: number) {
-		this.model[modelNumber].start(reqUser).then(() => this.modelStarted(reqUser, modelNumber));
+	private startModel(reqUser: User, modelNumber: number) {
 		sendSms(
 			reqUser.phoneNumber,
-			`Model ${this.model[modelNumber].name} starting up. ${bolderize('Wait')} for a new message.`
+			`Model ${this.models[modelNumber].name} starting up. ${bolderize('Wait')} for a new message.`
 		);
+		this.models[modelNumber].start(reqUser).then(state => {
+			if (!state) {
+				sendSms(reqUser.phoneNumber, "An error occured, the model didn't start.");
+				return;
+			}
+			reqUser.otherInfo.set('LlamaServer_modelNumber', modelNumber);
+			reqUser.otherInfo.set(
+				'LlamaServer_closeTimer',
+				setTimeout(() => {
+					this.models[modelNumber].close();
+				}, 300_000)
+			);
+
+			sendSms(
+				reqUser.phoneNumber,
+				'Model started, you can talk to him. After 5 mins of inactivity, the model will be closed.'
+			);
+		});
 	}
 
-	private modelStarted(reqUser: User, modelNumber: number) {
-		reqUser.otherInfo.set('LlamaServer_modelNumber', modelNumber);
-		reqUser.otherInfo.set(
-			'LlamaServer_closeTimer',
-			setTimeout(() => {
-				this.model[modelNumber].close();
-			}, 300_000)
-		);
-
-		sendSms(
-			reqUser.phoneNumber,
-			`Model started, you can talk to him. If you don't talk to him for 5 minutes the model will be closed.`
-		);
-	}
-
-	loadConfog(): Array<Model> {
-		const data = fs.readFileSync('services/LLamaServer/config.json');
-		return (JSON.parse(data.toString()) as Array<any>).map(
-			el => new Model(el.name, el.path, el.port)
-		) as Array<Model>;
+	private loadConfig() {
+		const data = JSON.parse(fs.readFileSync('services/LLamaServer/config.json').toString()) as Array<any>;
+		return data.map(el => new Model(el.name, el.path, el.port)) as Array<Model>;
 	}
 }
 
