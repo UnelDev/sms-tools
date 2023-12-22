@@ -38,7 +38,7 @@ class Model {
 				lines.forEach(line => {
 					if (line.includes('HTTP server listening')) {
 						this.started = true;
-						console.log('Model started');
+						console.log('Model ' + this.name + ' started');
 						resolve(true);
 					}
 				});

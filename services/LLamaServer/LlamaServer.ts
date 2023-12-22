@@ -10,7 +10,7 @@ class llamaServer extends Service {
 	model: Array<Model>;
 	constructor() {
 		super();
-		this.name = 'llama one';
+		this.name = 'Llama one';
 		this.model = this.loadConfog();
 		if (this.model == undefined) this.model = [];
 	}
@@ -70,7 +70,7 @@ class llamaServer extends Service {
 		);
 	}
 
-	loadConfog(): Array<Model> {
+	loadConfog() {
 		const data = fs.readFileSync('services/LLamaServer/config.json');
 		return (JSON.parse(data.toString()) as Array<any>).map(
 			el => new Model(el.name, el.path, el.port)
