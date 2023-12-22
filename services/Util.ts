@@ -22,10 +22,10 @@ class Util extends service {
 		} else {
 			user.sendMessage(
 				`You have selected the ${bolderize('Util')} service. List of command:
-				${bolderize('ping')}: Reply pong
-				${bolderize('sendAt')}: send your message an another person
+${bolderize('ping')}: Reply pong
+${bolderize('sendAt')}: Send a message to someone
 
-				${bolderize('home')}: Go back to the main menu`
+${bolderize('home')}: Go back to the main menu`
 			);
 		}
 	}
