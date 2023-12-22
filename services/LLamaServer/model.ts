@@ -44,6 +44,7 @@ class Model {
 
 				const lines = buffer.split('\n');
 				buffer = lines.pop() as string;
+				console.log(lines);
 
 				if (lines.find(line => line.includes('HTTP server listening'))) {
 					this.started = true;
