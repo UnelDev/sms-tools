@@ -17,6 +17,9 @@ class Wikipedia extends Service {
 			message = message.replace('sl', '');
 			message = message.replace('selectlanguage', '');
 			this.changeLanguage(user, message);
+		} else if (message.startsWith('search')) {
+			message = message.replace('search', '');
+			this.search(user, message);
 		} else {
 			user.sendMessage(
 				`You have selected the ${bolderize('wikipedia')} service. List of command:
@@ -26,6 +29,24 @@ ${bolderize('event <number>')}: reply by all event which happened on this date
 ${bolderize('home')}: Go back to the main menu`
 			);
 		}
+	}
+
+	async search(user: User, message: string) {
+		const page = await wiki.page(message);
+		const intro = await page.intro();
+		console.log(intro);
+		if (intro.length > 1600) {
+			const splitPgae = intro.split('\n');
+			if (Math.max(...splitPgae.map(str => str.length)) > 1600) {
+				user.sendMessage('This page is too big for send');
+				return;
+			}
+
+			splitPgae.forEach(el => user.sendMessage(el));
+			return;
+		}
+		user.sendMessage(intro);
+		user.sendMessage('Attached link:\n' + page.fullurl);
 	}
 
 	async changeLanguage(user: User, message: string) {

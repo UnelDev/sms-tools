@@ -4,6 +4,7 @@ import express from 'express';
 
 import Switchboard from './Switchboard';
 import { IsPhoneNumber } from './tools/tools';
+import axios from 'axios';
 
 config();
 const app = express();
@@ -37,3 +38,17 @@ app.post('/', async (req, res) => {
 	console.log(`[<${chalk.blue(phoneNumber)}<] ${message}`);
 	switchboard.main(phoneNumber, message);
 });
+
+// const url = 'http://192.168.1.200:8080/v1/sms/';
+// const data = new URLSearchParams();
+// data.append('phone', '0769172331');
+// data.append('message', 'your message');
+
+// axios
+// 	.post(url, data)
+// 	.then(response => {
+// 		console.log(response);
+// 	})
+// 	.catch(error => {
+// 		console.error(error);
+// 	});
