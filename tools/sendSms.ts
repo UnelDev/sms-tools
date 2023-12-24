@@ -17,10 +17,19 @@ async function sendSms(phoneNumber: string, message: string) {
 
 	message = message.replaceAll('\n', '%0a');
 
-	const res = await axios.post(`http://${process.env.PHONE_IP}/send?message=${message}&phoneno=%2B${phoneNumber}`);
-	if (res?.data?.body?.success != true && typeof res?.data?.body?.success == undefined) {
-		console.log('[' + chalk.red('ERROR') + '] Sending: ' + res?.data?.body?.message);
-	}
+	const url = `http://${process.env.PHONE_IP}/v1/sms/`;
+	const data = new URLSearchParams();
+	data.append('phone', phoneNumber);
+	data.append('message', message);
+
+	axios
+		.post(url, data)
+		.then(response => {
+			if (response.data != 'OK') console.log(response.data);
+		})
+		.catch(error => {
+			console.error(error);
+		});
 }
 
 export default sendSms;
