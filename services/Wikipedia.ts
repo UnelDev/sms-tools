@@ -23,6 +23,7 @@ class Wikipedia extends Service {
 		} else {
 			user.sendMessage(
 				`You have selected the ${bolderize('wikipedia')} service. List of command:
+${bolderize('search')} <element>: searche element on wikipedia
 ${bolderize('selectLanguage | sl')}: select wikipedia language
 ${bolderize('event <number>')}: reply by all event which happened on this date
 
@@ -32,10 +33,13 @@ ${bolderize('home')}: Go back to the main menu`
 	}
 
 	async search(user: User, message: string) {
+		if (message.trim() == '') {
+			user.sendMessage('Element must be world');
+			return;
+		}
 		wiki.setLang(user.otherInfo.get('Wikipedia_language') ?? 'en');
 		const page = await wiki.page(message);
 		const intro = await page.intro();
-		console.log(intro);
 		if (intro.length > 1600) {
 			const splitPgae = intro.split('\n');
 			if (Math.max(...splitPgae.map(str => str.length)) > 1600) {
