@@ -15,12 +15,19 @@ async function sendSms(phoneNumber: string, message: string) {
 	}
 	console.log(`[>${chalk.green(phoneNumber)}>] ${message}`);
 
-	message = message.replaceAll('\n', '%0a');
+	const url = `http://${process.env.PHONE_IP}/v1/sms/`;
+	const data = new URLSearchParams();
+	data.append('phone', phoneNumber);
+	data.append('message', message);
 
-	const res = await axios.post(`http://${process.env.PHONE_IP}/send?message=${message}&phoneno=%2B${phoneNumber}`);
-	if (res?.data?.body?.success != true && typeof res?.data?.body?.success == undefined) {
-		console.log('[' + chalk.red('ERROR') + '] Sending: ' + res?.data?.body?.message);
-	}
+	axios
+		.post(url, data)
+		.then(response => {
+			if (response.data != 'OK') console.log(response.data);
+		})
+		.catch(error => {
+			console.error(error);
+		});
 }
 
 export default sendSms;
