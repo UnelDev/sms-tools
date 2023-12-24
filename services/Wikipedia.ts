@@ -32,6 +32,7 @@ ${bolderize('home')}: Go back to the main menu`
 	}
 
 	async search(user: User, message: string) {
+		wiki.setLang(user.otherInfo.get('Wikipedia_language') ?? 'en');
 		const page = await wiki.page(message);
 		const intro = await page.intro();
 		console.log(intro);
