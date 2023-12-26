@@ -2,9 +2,9 @@ import chalk from 'chalk';
 import { config } from 'dotenv';
 import express from 'express';
 
+import { AddressInfo } from 'net';
 import Switchboard from './Switchboard';
 import { IsPhoneNumber } from './tools/tools';
-import axios from 'axios';
 
 config();
 const app = express();
@@ -13,7 +13,7 @@ app.use(express.json());
 const switchboard = new Switchboard();
 
 const server = app.listen(process.env.port, () => {
-	console.log('Listening on port ' + (server.address() as any).port);
+	console.log('Listening on port ' + (server.address() as AddressInfo).port);
 });
 
 app.post('/', async (req, res) => {

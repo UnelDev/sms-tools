@@ -46,7 +46,13 @@ ${bolderize('home')}: Go back to the main menu`);
 				return;
 			}
 
-			splitPage.forEach(el => user.sendMessage(el));
+			splitPage.forEach((el, i) => {
+				const message = '[' + (i + 1) + '/' + splitPage.length + ']';
+				const temp = el.split('');
+				temp.unshift(message, '\n');
+				temp.push('\n', message);
+				user.sendMessage(temp.join(''));
+			});
 			return;
 		}
 		user.sendMessage(intro);
