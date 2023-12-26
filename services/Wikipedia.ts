@@ -41,12 +41,17 @@ ${bolderize('home')}: Go back to the main menu`);
 		const intro = await page.intro();
 		if (intro.length > 1600) {
 			const splitPage = intro.split('\n');
-			if (Math.max(...splitPage.map(str => str.length)) > 1600) {
+			// Adding the paging sections
+			const maxSmsLength = 1600 - 16;
+			if (Math.max(...splitPage.map(str => str.length)) > maxSmsLength) {
 				user.sendMessage('This page is too large to send');
 				return;
 			}
 
-			splitPage.forEach(el => user.sendMessage(el));
+			splitPage.forEach((el, i) => {
+				const pageNumber = '[' + (i + 1) + '/' + splitPage.length + ']';
+				user.sendMessage(pageNumber.concat('\n').concat(el).concat('\n').concat(pageNumber));
+			});
 			return;
 		}
 		user.sendMessage(intro);
