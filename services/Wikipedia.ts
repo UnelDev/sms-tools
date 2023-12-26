@@ -1,12 +1,13 @@
 import wiki, { languageResult, wikiSummary } from 'wikipedia';
-import Service from './Service';
-import User from '../user/User';
+
 import { bolderize } from '../tools/tools';
+import User from '../user/User';
+import Service from './Service';
 
 class Wikipedia extends Service {
 	constructor() {
 		super();
-		this.name = 'wikipedia';
+		this.name = 'Wikipedia';
 	}
 
 	newAction(user: User, message: string) {
@@ -21,33 +22,31 @@ class Wikipedia extends Service {
 			message = message.replace('search', '');
 			this.search(user, message);
 		} else {
-			user.sendMessage(
-				`You have selected the ${bolderize('wikipedia')} service. List of command:
-${bolderize('search')} <element>: searche element on wikipedia
-${bolderize('selectLanguage | sl')}: select wikipedia language
-${bolderize('event <number>')}: reply by all event which happened on this date
+			user.sendMessage(`You have selected the ${bolderize('Wikipedia')} service. List of command:
+${bolderize('search')} <element>: Search something on Wikipedia
+${bolderize('selectLanguage | sl')}: Change the Wikipedia language
+${bolderize('event <number>')}: See all events that happened on this date
 
-${bolderize('home')}: Go back to the main menu`
-			);
+${bolderize('home')}: Go back to the main menu`);
 		}
 	}
 
 	async search(user: User, message: string) {
 		if (message.trim() == '') {
-			user.sendMessage('Element must be world');
+			user.sendMessage('Usage: search <terms>');
 			return;
 		}
 		wiki.setLang(user.otherInfo.get('Wikipedia_language') ?? 'en');
 		const page = await wiki.page(message);
 		const intro = await page.intro();
 		if (intro.length > 1600) {
-			const splitPgae = intro.split('\n');
-			if (Math.max(...splitPgae.map(str => str.length)) > 1600) {
-				user.sendMessage('This page is too big for send');
+			const splitPage = intro.split('\n');
+			if (Math.max(...splitPage.map(str => str.length)) > 1600) {
+				user.sendMessage('This page is too large to send');
 				return;
 			}
 
-			splitPgae.forEach(el => user.sendMessage(el));
+			splitPage.forEach(el => user.sendMessage(el));
 			return;
 		}
 		user.sendMessage(intro);
@@ -58,19 +57,19 @@ ${bolderize('home')}: Go back to the main menu`
 		message = message.trim();
 		if (message != '') {
 			const language = await wiki.languages();
-			const selectLanguage = existInLangage(language, message);
+			const selectLanguage = existInLanguage(language, message);
 			if (selectLanguage != false) {
 				user.sendMessage(
-					'You have selected ' + selectLanguage[Object.keys(selectLanguage)[0]] + ' language for wikipedia'
+					'You have selected ' + selectLanguage[Object.keys(selectLanguage)[0]] + ' language for Wikipedia.'
 				);
 				user.otherInfo.set('Wikipedia_language', Object.keys(selectLanguage)[0]);
 				user.save();
 			} else {
-				user.sendMessage('This language is unknow select another langauge, eg: fr, de, en');
+				user.sendMessage('Language is unknown. Select another one. eg: fr, de, en');
 			}
 		}
-		function existInLangage(langauge: languageResult[], search: string) {
-			for (const object of langauge) {
+		function existInLanguage(language: languageResult[], search: string) {
+			for (const object of language) {
 				if (Object.keys(object)[0] == search) {
 					return object;
 				}
@@ -84,7 +83,7 @@ ${bolderize('home')}: Go back to the main menu`
 			wiki.setLang(user.otherInfo.get('Wikipedia_language') ?? 'en');
 			const events = await wiki.onThisDay({ type: 'selected' });
 			if (events.selected == undefined) {
-				user.sendMessage('Error in wikipedia');
+				user.sendMessage('Error in Wikipedia');
 				return;
 			}
 			if (message.trim() != '') {
@@ -111,8 +110,9 @@ ${bolderize('home')}: Go back to the main menu`
 				);
 			}
 		} catch (error) {
-			user.sendMessage('Error in wikipedia');
+			user.sendMessage('Error in Wikipedia');
 		}
+
 		function crearteLinkList(page: wikiSummary[]) {
 			return page.map(el => {
 				return '\n' + el.normalizedtitle + ': ' + el.content_urls.mobile.page;

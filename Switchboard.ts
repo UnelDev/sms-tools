@@ -56,7 +56,7 @@ class Switchboard {
 				return '\n' + i + ': ' + service.name + ' ' + bolderize(options);
 			})
 			.join('');
-		sendSms(phoneNumber, `Select an application: ${serviceList}`);
+		sendSms(phoneNumber, 'Select an application: ' + serviceList);
 	}
 
 	private selectApp(phoneNumber: string, message: string) {
