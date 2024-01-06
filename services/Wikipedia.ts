@@ -1,4 +1,4 @@
-import wiki, { languageResult, wikiSummary } from 'wikipedia';
+import wiki, { infobox, languageResult, wikiSummary } from 'wikipedia';
 
 import { bolderize } from '../tools/tools';
 import User from '../user/User';
@@ -38,24 +38,33 @@ ${bolderize('home')}: Go back to the main menu`);
 		}
 		wiki.setLang(user.otherInfo.get('Wikipedia_language') ?? 'en');
 		const page = await wiki.page(message);
-		const intro = await page.intro();
-		if (intro.length > 1600) {
-			const splitPage = intro.split('\n');
-			// Adding the paging sections
-			const maxSmsLength = 1600 - 16;
-			if (Math.max(...splitPage.map(str => str.length)) > maxSmsLength) {
-				user.sendMessage('This page is too large to send');
+		const categories = await page.summary();
+		if (categories.type == 'disambiguation') {
+			console.log();
+			user.sendMessage(
+				`This page is a disambiguation page.\ninformation on this search:\n${categories.extract} \npage link: ` +
+					page.fullurl
+			);
+		} else {
+			const intro = await page.intro();
+			if (intro.length > 1600) {
+				const splitPage = intro.split('\n');
+				// Adding the paging sections
+				const maxSmsLength = 1600 - 16;
+				if (Math.max(...splitPage.map(str => str.length)) > maxSmsLength) {
+					user.sendMessage('This page is too large to send');
+					return;
+				}
+
+				splitPage.forEach((el, i) => {
+					const pageNumber = '[' + (i + 1) + '/' + splitPage.length + ']';
+					user.sendMessage(pageNumber.concat('\n').concat(el).concat('\n').concat(pageNumber));
+				});
 				return;
 			}
-
-			splitPage.forEach((el, i) => {
-				const pageNumber = '[' + (i + 1) + '/' + splitPage.length + ']';
-				user.sendMessage(pageNumber.concat('\n').concat(el).concat('\n').concat(pageNumber));
-			});
-			return;
+			user.sendMessage(intro);
+			user.sendMessage('Attached link:\n' + page.fullurl);
 		}
-		user.sendMessage(intro);
-		user.sendMessage('Attached link:\n' + page.fullurl);
 	}
 
 	async changeLanguage(user: User, message: string) {
