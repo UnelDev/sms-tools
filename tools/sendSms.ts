@@ -2,6 +2,7 @@ import axios from 'axios';
 import chalk from 'chalk';
 
 async function sendSms(phoneNumber: string, message: string) {
+	message = message.replaceAll('\n', '%0a');
 	const phoneArray = phoneNumber.split('');
 	if (phoneArray[0] == '0') {
 		phoneArray.shift();
@@ -15,19 +16,10 @@ async function sendSms(phoneNumber: string, message: string) {
 	}
 	console.log(`[>${chalk.green(phoneNumber)}>] ${message}`);
 
-	const url = `http://${process.env.PHONE_IP}/v1/sms/`;
-	const data = new URLSearchParams();
-	data.append('phone', phoneNumber);
-	data.append('message', message);
-
-	axios
-		.post(url, data)
-		.then(response => {
-			if (response.data != 'OK') console.log(response.data);
-		})
-		.catch(error => {
-			console.error(error);
-		});
+	const res = await axios.post(`http://${process.env.PHONE_IP}/send?message=${message}&phoneno=%2B${phoneNumber}`);
+	if (res?.data?.body?.success != true && typeof res?.data?.body?.success == undefined) {
+		console.log('[' + chalk.red('ERROR') + ']' + ' send error ' + res?.data?.body?.message);
+	}
 }
 
 export default sendSms;

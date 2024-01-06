@@ -32,7 +32,8 @@ class llamaServer extends Service {
 				return `\n${i}: ` + value.name;
 			})
 			.join('');
-		sendSms(user.phoneNumber, `Select your model: ${modelList}\n\n${bolderize('home')}: Go to main menu`);
+		sendSms(user.phoneNumber, `Select your model:${modelList}\n\n${bolderize('home')}: Go to main menu`);
+		// sendSms(user.phoneNumber, `Select your model: ${modelList}\n\n${bolderize('home')}: Go to main menu`);
 	}
 
 	private newQuestion(reqUser: User, message: string) {
