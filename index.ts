@@ -17,14 +17,14 @@ const server = app.listen(process.env.port, () => {
 });
 
 app.post('/', async (req, res) => {
-	if (typeof req.body.message != 'string' || typeof req.body.contact != 'string') {
+	console.log(req);
+	res.status(200);
+	if (typeof req.body.text != 'string' || typeof req.body.from != 'string') {
 		console.log('bad body');
 		return;
 	}
-	res.status(200);
-	let phoneNumber = req.body.contact;
-	let message: string = req.body.message;
-	res.status(200);
+	let phoneNumber = req.body.from;
+	let message: string = req.body.text;
 	message.trim();
 
 	if (phoneNumber.startsWith('+33')) {
@@ -38,17 +38,3 @@ app.post('/', async (req, res) => {
 	console.log(`[<${chalk.blue(phoneNumber)}<] ${message}`);
 	switchboard.main(phoneNumber, message);
 });
-
-// const url = 'http://192.168.1.200:8080/v1/sms/';
-// const data = new URLSearchParams();
-// data.append('phone', '0769172331');
-// data.append('message', 'your message');
-
-// axios
-// 	.post(url, data)
-// 	.then(response => {
-// 		console.log(response);
-// 	})
-// 	.catch(error => {
-// 		console.error(error);
-// 	});

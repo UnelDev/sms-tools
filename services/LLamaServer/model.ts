@@ -39,7 +39,9 @@ class Model {
 		});
 
 		// Doesn't work without this
-		this.child.stdout.on('data', () => {});
+		this.child.stdout.on('data', data => {
+			console.log(data.toString());
+		});
 
 		return new Promise(resolve => {
 			// Wait 30 seconds before giving up
