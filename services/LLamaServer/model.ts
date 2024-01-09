@@ -24,7 +24,14 @@ class Model {
 		this.userTalk = userTalk;
 		this.child = spawn(
 			this.path,
-			['-m', '/opt/llama.cpp/models/' + this.name + '.gguf', '-c', '2048', '--port', this.port.toString()],
+			[
+				'-m',
+				'/opt/llama.cpp/models/' + this.name + '/ggml-model-q4_0.gguf',
+				'-c',
+				'2048',
+				'--port',
+				this.port.toString()
+			],
 			{ detached: false }
 		);
 
