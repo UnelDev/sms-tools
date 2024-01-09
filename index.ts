@@ -17,7 +17,6 @@ const server = app.listen(process.env.port, () => {
 });
 
 app.post('/', async (req, res) => {
-	console.log(req);
 	res.status(200);
 	if (typeof req.body.text != 'string' || typeof req.body.from != 'string') {
 		console.log('bad body');
