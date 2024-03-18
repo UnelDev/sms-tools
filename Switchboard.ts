@@ -1,21 +1,32 @@
+import chalk from 'chalk';
 import llamaServer from './services/LLamaServer/LlamaServer';
 import Service from './services/Service';
 import util from './services/Util';
 import Wikipedia from './services/Wikipedia';
+import loadEnvironment from './tools/loadEnvironment';
 import restore from './tools/restore';
 import sendSms from './tools/sendSms';
 import { bolderize, findUserByPhone } from './tools/tools';
 import User from './user/User';
+import CallSphere from './services/CallSphere';
 
 class Switchboard {
 	services: Array<Service> = [];
 	private users: Array<User> = restore();
+	env: { refuseDefault: boolean; authoriseNumbers: Array<string> };
+
 	constructor() {
 		this.services.push(new util());
 		this.services.push(new llamaServer());
 		this.services.push(new Wikipedia());
+		this.services.push(new CallSphere());
+		this.env = loadEnvironment();
 	}
 	main(phoneNumber: string, message: string) {
+		if (!this.env.refuseDefault || !this.env.authoriseNumbers.includes(phoneNumber)) {
+			console.log(`[<${chalk.blue(phoneNumber)}<] not authorised`);
+			return;
+		}
 		message = message.toLowerCase();
 		if (!this.isActivePhone(phoneNumber)) {
 			//new user

@@ -73,8 +73,12 @@ class llamaServer extends Service {
 	}
 
 	private loadConfig() {
-		const data = JSON.parse(fs.readFileSync('services/LLamaServer/config.json').toString()) as Array<any>;
-		return data.map(el => new Model(el.name, el.path, el.port)) as Array<Model>;
+		try {
+			const data = JSON.parse(fs.readFileSync('services/LLamaServer/config.json').toString()) as Array<any>;
+			return data.map(el => new Model(el.name, el.path, el.port)) as Array<Model>;
+		} catch (e) {
+			return [];
+		}
 	}
 }
 
