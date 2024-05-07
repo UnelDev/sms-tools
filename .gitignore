@@ -6,4 +6,3 @@ services/LLamaServer/config.json
 *.env
 *.http
 *.log
-config.json
