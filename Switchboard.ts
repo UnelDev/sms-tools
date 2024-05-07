@@ -9,6 +9,7 @@ import sendSms from './tools/sendSms';
 import { bolderize, findUserByPhone } from './tools/tools';
 import User from './user/User';
 import CallSphere from './services/CallSphere';
+import Tickets from './services/tickets';
 
 class Switchboard {
 	services: Array<Service> = [];
@@ -19,6 +20,7 @@ class Switchboard {
 		this.services.push(new util());
 		this.services.push(new llamaServer());
 		this.services.push(new Wikipedia());
+		this.services.push(new Tickets());
 		this.services.push(new CallSphere());
 		this.env = loadEnvironment();
 	}
