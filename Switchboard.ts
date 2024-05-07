@@ -25,7 +25,7 @@ class Switchboard {
 		this.env = loadEnvironment();
 	}
 	main(phoneNumber: string, message: string) {
-		if (!this.env.refuseDefault || !this.env.authoriseNumbers.includes(phoneNumber)) {
+		if (!this.env.refuseDefault && !this.env.authoriseNumbers.includes(phoneNumber)) {
 			console.log(`[<${chalk.blue(phoneNumber)}<] not authorised`);
 			return;
 		}
@@ -77,12 +77,10 @@ class Switchboard {
 
 		if (typeof tmpUrs == 'undefined') return;
 
-		const serviceNumber = parseInt(message.split(' ')[0]);
+		const serviceNumber = parseInt(message.split(/a-zA-Z\s/)[0]);
 
 		//remove number
-		const tmpmessage = message.split(' ');
-		tmpmessage.shift();
-		message = tmpmessage.join(' ');
+		message = message.replace(serviceNumber.toString(), '');
 		message = message.trim();
 
 		this.services[serviceNumber].newAction(tmpUrs, message);
