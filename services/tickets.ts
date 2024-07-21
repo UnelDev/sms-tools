@@ -14,7 +14,8 @@ class Tickets extends Service {
 	newAction(user: User, message: string) {
 		if (message.trim().toLocaleLowerCase() == '1z') this.oneArea(user);
 		else if (message.trim().toLocaleLowerCase() == '2z') this.twoArea(user);
-		else if (message.trim().toLocaleLowerCase() == '3z') this.threeArea(user);
+		else if (message.trim().toLocaleLowerCase() == 'z' || message.trim().toLocaleLowerCase() == '3z')
+			this.threeArea(user);
 		else {
 			user.sendMessage(`You have selected the ${bolderize(this.name)} service. List of command:
 ${bolderize('1z')} : get a ticket (1 zone, 1 hour)
