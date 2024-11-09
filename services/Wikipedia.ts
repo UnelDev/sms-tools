@@ -102,7 +102,7 @@ ${bolderize('home')}: Go back to the main menu`);
 			}
 			if (message.trim() != '') {
 				const target = parseInt(message.trim());
-				if (isNaN(target) || target >= (events.selected?.length - 1 ?? 0)) {
+				if (isNaN(target) || target >= events.selected?.length - 1) {
 					user.sendMessage('Invalid number');
 					return;
 				} else {
