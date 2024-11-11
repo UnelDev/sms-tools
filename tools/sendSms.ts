@@ -1,24 +1,20 @@
 import chalk from 'chalk';
-async function sendSms(phoneNumber: string, message: string) {
-	const phoneArray = phoneNumber.split('');
-	if (phoneArray[0] == '0') {
-		phoneArray.shift();
-		phoneArray.unshift('3');
-		phoneArray.unshift('3');
-		phoneArray.unshift('+');
-		phoneNumber = phoneArray.join('');
-	} else if (phoneNumber[0] != '+') {
-		console.log('[' + chalk.red('ERROR') + '] Bad phoneNumber: ' + phoneNumber);
+import { Message } from '../models/message';
+import { log } from './log';
+import { clearPhone } from './tools';
+async function sendSms(phoneNumber: string, message: string, initiator: string = 'root') {
+	const phone = clearPhone(phoneNumber);
+	if (!phone) {
+		log('Bad phone:', 'ERROR', __filename, phone, initiator);
 		return;
 	}
-	console.log(`[>${chalk.green(phoneNumber)}>] ${message}`);
 
-	const auth = 'Basic ' + Buffer.from(`${process.env.USERNAME}:${process.env.PASSWORD}`).toString('base64');
 	const options = {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
-			Authorization: auth
+			Authorization:
+				'Basic ' + Buffer.from(`${process.env.SMS_USERNAME}:${process.env.PASSWORD}`).toString('base64')
 		},
 		body: JSON.stringify({
 			message,
@@ -26,11 +22,18 @@ async function sendSms(phoneNumber: string, message: string) {
 		})
 	};
 
-	// Envoi de la requête
-	const res = await fetch('http://192.168.1.193:8080/message', options);
-	if (res.status != 202) {
-		console.log('[' + chalk.red('ERROR') + ']' + ' send error ' + res.statusText);
+	const messageObj = new Message({
+		contactID: phoneNumber,
+		message,
+		direction: false
+	}).save();
+	const res = await (await fetch(process.env.GATEWAY_URL + '/message', options)).json();
+	if (!res.id) {
+		log('Error sending message: ' + res, 'ERROR', __filename, initiator);
+		return;
 	}
+	await Message.findByIdAndUpdate((await messageObj)._id, { messageId: res.id });
+	log('Message sent', 'INFO', __filename, message, initiator);
 }
 
 export default sendSms;

@@ -1,5 +1,4 @@
-import Service from '../services/Service';
-import User from '../user/User';
+import { log } from './log';
 
 function bolderize(text: string) {
 	return text
@@ -28,12 +27,21 @@ function IsPhoneNumber(number: any) {
 	return true;
 }
 
-function findUserByPhone(users: Array<User>, phoneNumber: string) {
-	return users.find(usr => usr.phoneNumber == phoneNumber);
+function getFileName(filename: string) {
+	return filename?.split('\\')?.at(-1)?.split('/')?.at(-1) ?? 'error';
 }
 
-function findServiceByName(services: Array<Service>, name: string) {
-	return services.find(serv => serv.name == name);
+function clearPhone(phone: string): string | null {
+	const phoneArray = phone.split('');
+	if (phoneArray[0] == '0') {
+		phoneArray.shift();
+		phoneArray.unshift('3');
+		phoneArray.unshift('3');
+		phoneArray.unshift('+');
+		phone = phoneArray.join('');
+	} else if (phone[0] != '+') {
+		return null;
+	}
+	return phone;
 }
-
-export { IsPhoneNumber, bolderize, findServiceByName, findUserByPhone };
+export { IsPhoneNumber, bolderize, getFileName, clearPhone };
