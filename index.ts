@@ -2,17 +2,19 @@ import { config } from 'dotenv';
 import express from 'express';
 import fs from 'fs';
 import https from 'https';
-import { AddressInfo } from 'net';
-import { IsPhoneNumber } from './tools/tools';
 import mongoose from 'mongoose';
-import { log } from './tools/log';
-import messageRecevied from './messageRecevied';
-import sendSms from './tools/sendSms';
+import { AddressInfo } from 'net';
 import { eventDelivered, eventfailed, eventSent } from './messageEvent';
+import messageRecevied from './messageRecevied';
+import { log } from './tools/log';
+import { IsPhoneNumber } from './tools/tools';
+import { loadServices } from './tools/utils';
 
 config();
 const app = express();
 app.use(express.json());
+
+//////////////////////////data base/////////////////////////////////////////////
 
 // in test, the test script will create the connection to the database
 if (process.env.JEST_WORKER_ID == undefined) {
@@ -37,6 +39,10 @@ if (process.env.JEST_WORKER_ID == undefined) {
 			});
 	}
 }
+//////////////////////////Service class/////////////////////////////////////////////
+
+const servicesClass = loadServices();
+//////////////////////////express server/////////////////////////////////////////////
 
 const server = https.createServer(
 	{
@@ -74,10 +80,11 @@ app.post('/sms', (req, res) => {
 		log('Invalid phone number', 'ERROR', __filename, null, req.hostname);
 		return;
 	}
-	messageRecevied(message, phoneNumber, req.body.id);
+	messageRecevied(message, phoneNumber, req.body.id, servicesClass);
 });
 
 app.post('/sent', (req, res) => {
+	console.log('send');
 	res.status(200).send();
 	if (typeof req.body.payload.messageId !== 'string') {
 		log('Invalid request body for /sent', 'ERROR', __filename, null, req.hostname);

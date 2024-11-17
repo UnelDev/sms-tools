@@ -68,3 +68,8 @@ PASSWORD=password_on_sms_gateway
 ```
 npm start
 ```
+
+## Custom service
+
+warning: if your service save data on user's aditional data field, your data must not be too large, otherwise it will slow down the database.
+if you need to save large data, you must create a new table, or save it on Json file.

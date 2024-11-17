@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 
 const MessageModel = new mongoose.Schema({
 	date: { type: Date, default: Date.now },
-	contactID: { type: String, required: true },
+	contactID: { type: mongoose.Schema.ObjectId, ref: 'Contact', required: true },
+	sendUser: { type: mongoose.Schema.ObjectId, ref: 'User', required: false },
 	message: { type: String, required: true },
 	direction: { type: Boolean, required: true }, // in or out in: true, out: false
 	status: {
@@ -12,7 +13,7 @@ const MessageModel = new mongoose.Schema({
 		required: true,
 		index: true
 	},
-	messageId: { type: String, required: false, index: true, unique: true, sparse: true },
+	messageId: { type: String, required: false, index: true, unique: true, sparse: true }, // id from gateway
 	deliveredAt: { type: Date, required: false },
 	sendAt: { type: Date, required: false }
 });

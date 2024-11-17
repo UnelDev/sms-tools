@@ -73,7 +73,7 @@ export async function log(
 			data != null ? JSON.stringify(data) : ''
 		}\n`
 	);
-	// append log in file
+	// append log
 	if (bddSaving) {
 		await bddSaving;
 	}
