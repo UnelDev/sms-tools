@@ -1,4 +1,4 @@
-import { Contact } from '../../models/contact';
+import { User } from '../../models/user';
 import { sendSms } from '../../tools/sendSms';
 import ServicesClass from '../service';
 
@@ -12,13 +12,13 @@ class tickets extends ServicesClass {
 		this.commands = ['1z', '2z', '3z'];
 		this.bypassTrigger = ['1z', '2z', '3z'];
 	}
-	newMessage(contact: InstanceType<typeof Contact>, message: string) {
-		if (message == '1z' || message == "'1z") this.oneArea(contact);
-		else if (message == '2z' || message == "'2z") this.twoArea(contact);
-		else if (message == '3z' || message == "'3z") this.threeArea(contact);
+	newMessage(user: InstanceType<typeof User>, message: string) {
+		if (message == '1z' || message == "'1z") this.oneArea(user);
+		else if (message == '2z' || message == "'2z") this.twoArea(user);
+		else if (message == '3z' || message == "'3z") this.threeArea(user);
 	}
 
-	threeArea(contact: InstanceType<typeof Contact>) {
+	private threeArea(user: InstanceType<typeof User>) {
 		{
 			const date = new Date();
 			const day = date.getDate().toString().padStart(2, '0');
@@ -27,7 +27,7 @@ class tickets extends ServicesClass {
 			const hoursEnd = new Date();
 			hoursEnd.setHours(hoursEnd.getHours() + 2);
 			sendSms(
-				contact,
+				user,
 				`Cars Région
 Titre 3 zones
 
@@ -43,14 +43,14 @@ A PRÉSENTER AU CONDUCTEUR
 
 78'52'72'38'99'34
 
-${contact.phoneNumber.replaceAll('+33', '')}S0XU
+${user.phoneNumber.replaceAll('+33', '')}S0XU
 bit.ly/CGVticketSMS
 			`
 			);
 		}
 	}
 
-	oneArea(contact: InstanceType<typeof Contact>) {
+	private oneArea(user: InstanceType<typeof User>) {
 		{
 			const date = new Date();
 			const day = date.getDate().toString().padStart(2, '0');
@@ -59,7 +59,7 @@ bit.ly/CGVticketSMS
 			const hoursEnd = new Date();
 			hoursEnd.setHours(hoursEnd.getHours() + 1);
 			sendSms(
-				contact,
+				user,
 				`Cars Région
 Titre 1 zone
 
@@ -75,14 +75,14 @@ A PRÉSENTER AU CONDUCTEUR
 
 78'52'72'38'99'34
 
-${contact.phoneNumber.replaceAll('+33', '')}S0XU
+${user.phoneNumber.replaceAll('+33', '')}S0XU
 bit.ly/CGVticketSMS
 				`
 			);
 		}
 	}
 
-	twoArea(contact: InstanceType<typeof Contact>) {
+	private twoArea(user: InstanceType<typeof User>) {
 		{
 			const date = new Date();
 			const day = date.getDate().toString().padStart(2, '0');
@@ -91,7 +91,7 @@ bit.ly/CGVticketSMS
 			const hoursEnd = new Date();
 			hoursEnd.setHours(hoursEnd.getHours() + 2);
 			sendSms(
-				contact,
+				user,
 				`Cars Région
 Titre 2 zones
 
@@ -107,7 +107,7 @@ A PRÉSENTER AU CONDUCTEUR
 
 78'52'72'38'99'34
 
-${contact.phoneNumber.replaceAll('+33', '')}S0XU
+${user.phoneNumber.replaceAll('+33', '')}S0XU
 bit.ly/CGVticketSMS
 				`
 			);

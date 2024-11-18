@@ -6,9 +6,21 @@ import { User } from '../models/user';
 async function sendSms(
 	contact: InstanceType<typeof Contact>,
 	message: string,
+	initiator?: string,
+	sendUser?: InstanceType<typeof User>
+): Promise<void>;
+async function sendSms(
+	contact: InstanceType<typeof User>,
+	message: string,
+	initiator?: string,
+	sendUser?: InstanceType<typeof User>
+): Promise<void>;
+async function sendSms(
+	contact: InstanceType<typeof Contact> | InstanceType<typeof User>,
+	message: string,
 	initiator: string = 'root',
 	sendUser?: InstanceType<typeof User>
-) {
+): Promise<void> {
 	const phone = clearPhone(contact.phoneNumber);
 	if (!phone) {
 		log('Bad phone:', 'ERROR', __filename, { message, contact }, initiator);

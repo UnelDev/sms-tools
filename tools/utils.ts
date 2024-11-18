@@ -6,7 +6,7 @@ import fs from 'node:fs';
 import { log } from './log';
 
 /**
- * Get user by phone number
+ * Get contact by phone number
  * @warning This function dont log anything
  */
 async function getContact(phoneNumber: string): Promise<InstanceType<typeof Contact> | undefined> {
@@ -15,6 +15,18 @@ async function getContact(phoneNumber: string): Promise<InstanceType<typeof Cont
 		return;
 	}
 	return contact;
+}
+
+/**
+ * Get user by phone number
+ * @warning This function dont log anything
+ */
+async function getUser(phoneNumber: string): Promise<InstanceType<typeof User> | undefined> {
+	const user = await User.findOne({ phoneNumber: { $eq: phoneNumber } });
+	if (!user) {
+		return;
+	}
+	return user;
 }
 
 async function loadServices(): Promise<Array<ServicesClass>> {
@@ -57,4 +69,15 @@ async function createContact(phoneNumber: string): Promise<InstanceType<typeof C
 	return contact;
 }
 
-export { getContact, loadServices, createContact };
+async function createUser(phoneNumber: string): Promise<InstanceType<typeof User> | undefined> {
+	const user = await User.create({
+		phoneNumber
+	});
+	if (!user) {
+		log('error in creating client', 'WARNING', __filename);
+		return;
+	}
+	return user;
+}
+
+export { getContact, getUser, loadServices, createContact, createUser };

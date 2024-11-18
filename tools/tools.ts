@@ -1,5 +1,13 @@
-import { log } from './log';
-
+/**
+ * Converts the input text to a bold Unicode variant.
+ *
+ * This function takes a string and transforms each character into its bold Unicode equivalent,
+ * if such an equivalent exists. It supports bold transformation for lowercase letters (a-z),
+ * uppercase letters (A-Z), and digits (0-9). Characters outside these ranges are not transformed.
+ *
+ * @param text - The input string to be transformed.
+ * @returns The transformed string with bold Unicode characters.
+ */
 function bolderize(text: string) {
 	return text
 		.split('')
@@ -9,10 +17,13 @@ function bolderize(text: string) {
 			if (typeof code == 'undefined') return char;
 
 			if (code >= 97 && code <= 122) {
+				// a-z
 				return String.fromCodePoint(code + 120_205);
 			} else if (code >= 65 && code <= 90) {
+				// A-Z
 				return String.fromCodePoint(code + 120_211);
 			} else if (code >= 48 && code <= 57) {
+				//0-9
 				return String.fromCodePoint(code + 120_764);
 			}
 			return char;
@@ -44,4 +55,4 @@ function clearPhone(phone: string): string | null {
 	}
 	return phone;
 }
-export { IsPhoneNumber, bolderize, getFileName, clearPhone };
+export { bolderize, clearPhone, getFileName, IsPhoneNumber };

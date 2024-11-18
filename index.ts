@@ -84,7 +84,6 @@ app.post('/sms', (req, res) => {
 });
 
 app.post('/sent', (req, res) => {
-	console.log('send');
 	res.status(200).send();
 	if (typeof req.body.payload.messageId !== 'string') {
 		log('Invalid request body for /sent', 'ERROR', __filename, null, req.hostname);
