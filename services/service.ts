@@ -1,5 +1,5 @@
 import { sendSms } from '../tools/sendSms';
-import { User } from '../models/user';
+import { User } from '../models/user.model';
 class ServicesClass {
 	name: string;
 	description: string;

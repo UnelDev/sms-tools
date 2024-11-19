@@ -1,8 +1,8 @@
-import { Message } from '../models/message';
+import { Message } from '../models/message.model';
 import { log } from './log';
 import { clearPhone } from './tools';
-import { Contact } from '../models/contact';
-import { User } from '../models/user';
+import { Contact } from '../models/contact.model';
+import { User } from '../models/user.model';
 async function sendSms(
 	contact: InstanceType<typeof Contact>,
 	message: string,

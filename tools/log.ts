@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { getFileName } from './tools';
 import mongoose from 'mongoose';
-import { Log } from '../models/logs';
+import { Log } from '../models/logs.model';
 
 type WarningLevel = 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
 

@@ -1,4 +1,4 @@
-import { Message } from './models/message';
+import { Message } from './models/message.model';
 import { log } from './tools/log';
 
 async function eventSent(messageId: string, sendAt: Date) {

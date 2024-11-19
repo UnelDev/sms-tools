@@ -1,6 +1,6 @@
-import { User } from '../models/user';
+import { User } from '../models/user.model';
 import ServicesClass from '../services/service';
-import { Contact } from '../models/contact';
+import { Contact } from '../models/contact.model';
 import path from 'path';
 import fs from 'node:fs';
 import { log } from './log';

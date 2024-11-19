@@ -1,5 +1,6 @@
-import { User } from '../../models/user';
+import { User } from '../../models/user.model';
 import { sendSms } from '../../tools/sendSms';
+import { bolderize } from '../../tools/tools';
 import ServicesClass from '../service';
 
 class tickets extends ServicesClass {
@@ -16,6 +17,16 @@ class tickets extends ServicesClass {
 		if (message == '1z' || message == "'1z") this.oneArea(user);
 		else if (message == '2z' || message == "'2z") this.twoArea(user);
 		else if (message == '3z' || message == "'3z") this.threeArea(user);
+		else
+			sendSms(
+				user,
+				`You have selected the ${bolderize('tickets')} service. List of command:
+${bolderize('1z 🚀')} reply by one area tickets
+${bolderize('2z 🚀')} reply by two areas tickets
+${bolderize('3z 🚀')} reply by three areas tickets
+		
+${bolderize('home')}: Go back to the main menu`
+			);
 	}
 
 	private threeArea(user: InstanceType<typeof User>) {

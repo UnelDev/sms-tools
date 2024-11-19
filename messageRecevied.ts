@@ -1,4 +1,4 @@
-import { Message } from './models/message';
+import { Message } from './models/message.model';
 import ServicesClass from './services/service';
 import { log } from './tools/log';
 import { sendSms } from './tools/sendSms';
@@ -41,7 +41,8 @@ async function messageRecevied(
 		message = message.replace('home', '');
 		message = message.replace("'home", '');
 		message = message.trim();
-		await user.updateOne({ currentServices: 'nothing' });
+		user.currentServices = 'nothing';
+		await user.save();
 		log('user is go to home menu', 'INFO', __filename, { user });
 	}
 
@@ -104,10 +105,10 @@ async function messageRecevied(
 		sendSms(
 			user,
 			`Select an application:
-			${(await servicesClass).map((el, i) => {
-				return bolderize(i.toString() + ': ' + el.name) + ' ' + el.description + '\n';
-			})}
-			${bolderize('home')}: return on this menu`
+${(await servicesClass).map((el, i) => {
+	return bolderize(i.toString() + ': ' + el.name) + ' ' + el.description + '\n';
+})}
+${bolderize('home')}: return on this menu`
 		);
 	} else {
 		(await servicesClass).forEach(async serv => {
