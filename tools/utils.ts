@@ -80,4 +80,10 @@ async function createUser(phoneNumber: string): Promise<InstanceType<typeof User
 	return user;
 }
 
-export { getContact, getUser, loadServices, createContact, createUser };
+async function getOrCreateContact(phoneNumber: string): Promise<InstanceType<typeof Contact> | undefined> {
+	let contact = await getContact(phoneNumber);
+	if (!contact) contact = await createContact(phoneNumber);
+	return contact;
+}
+
+export { getContact, getUser, loadServices, createContact, createUser, getOrCreateContact };
