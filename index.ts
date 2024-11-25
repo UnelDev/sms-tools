@@ -9,6 +9,7 @@ import messageRecevied from './messageRecevied';
 import { log } from './tools/log';
 import { IsPhoneNumber } from './tools/tools';
 import { loadServices } from './tools/utils';
+import router from './router/routes';
 
 config();
 const app = express();
@@ -109,3 +110,4 @@ app.post('/failed', (req, res) => {
 	}
 	eventfailed(req.body.payload.messageId, new Date(), req.body.payload.reason);
 });
+app.use(router);

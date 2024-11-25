@@ -26,11 +26,13 @@
 		"chalk": "4.1.2",
 		"dotenv": "^16.3.2",
 		"express": "^4.21.0",
+		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^8.8.1",
 		"wikipedia": "^2.1.2"
 	},
 	"devDependencies": {
 		"@types/express": "^4.17.21",
+		"@types/jsonwebtoken": "^9.0.7",
 		"@types/node": "^20.11.5"
 	}
 }
