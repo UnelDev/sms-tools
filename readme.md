@@ -21,6 +21,8 @@ npm install
 GATEWAY_URL=http://phoneIP:8080
 USERNAME=SMS
 PASSWORD=password_on_sms_gateway
+BDD_URI_DEV=mongodb://localhost:27017/sms-tools-dev
+BDD_URI_TEST=mongodb://localhost:27017/sms-tools-test
 ```
 
 3. install `sms-gateway` on your phone: https://github.com/capcom6/android-sms-gateway

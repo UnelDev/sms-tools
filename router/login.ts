@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { checkParameters } from '../tools/utils';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model';
-import { clearPhone } from '../tools/tools';
+import { checkParameters, clearPhone } from '../tools/tools';
 import { log } from '../tools/log';
 /**
  * Handles user login by verifying the provided phone number and password.
@@ -35,7 +34,7 @@ async function login(req: Request<any>, res: Response<any>) {
 	const foundUser = await User.findOne({ phoneNumber, password });
 	if (foundUser) {
 		const user = { id: foundUser._id, phoneNumber };
-		const token = jwt.sign(user, 'SECRET_KEY', { expiresIn: '1h' });
+		const token = jwt.sign(user, process.env.privateJWTkey ?? 'error', { expiresIn: '1h' });
 		res.json({ token });
 		log(`login for user ${user.id}`, 'INFO', __filename, {
 			user,

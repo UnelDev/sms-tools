@@ -2,8 +2,7 @@ import { Message } from './models/message.model';
 import ServicesClass from './services/service';
 import { log } from './tools/log';
 import { sendSms } from './tools/sendSms';
-import { bolderize, clearPhone } from './tools/tools';
-import { createContact, createUser, getContact, getUser } from './tools/utils';
+import { bolderize, clearPhone, createUser, getUser } from './tools/tools';
 
 async function messageRecevied(
 	message: string,
@@ -29,7 +28,7 @@ async function messageRecevied(
 	}
 	log(`Message received`, 'INFO', __filename, { message, user }, user?._id.toString());
 	const messageObj = new Message({
-		userID: user._id,
+		senderID: user._id,
 		message,
 		direction: true,
 		status: 'received',

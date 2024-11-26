@@ -16,7 +16,7 @@ class wikipedia extends ServicesClass {
 	}
 
 	async newMessage(user: InstanceType<typeof User>, message: string) {
-		const language = (await WikipediaModel.findOne({ userID: user._id }, ['language']))?.language ?? 'en';
+		const language = (await WikipediaModel.findOne({ senderID: user._id }, ['language']))?.language ?? 'en';
 		if (message.startsWith('event')) {
 			message = message.replace('event', '');
 			this.event(user, message, language);
@@ -88,7 +88,7 @@ ${bolderize('home')}: Go back to the main menu`
 					'You have selected ' + selectLanguage[Object.keys(selectLanguage)[0]] + ' language for Wikipedia.'
 				);
 				await WikipediaModel.updateOne(
-					{ userID: user._id },
+					{ senderID: user._id },
 					{ language: Object.keys(selectLanguage)[0] },
 					{ upsert: true, setDefaultsOnInsert: true }
 				);

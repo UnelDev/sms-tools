@@ -5,11 +5,29 @@
 	"main": "index.ts",
 	"scripts": {
 		"start": "npx ts-node index.ts",
-		"dev": "npx nodemon index.ts"
+		"dev": "npx nodemon index.ts",
+		"test": "jest --testTimeout=10000 -o"
 	},
 	"author": {
 		"name": "UnelDev",
 		"url": "https://github.com/UnelDev"
+	},
+	"jest": {
+		"preset": "ts-jest",
+		"maxWorkers": 1,
+		"testEnvironment": "node",
+		"testMatch": [
+			"**/__tests__/**/*.ts?(x)",
+			"**/?(*.)+(spec|test).ts?(x)"
+		],
+		"moduleFileExtensions": [
+			"ts",
+			"tsx",
+			"js",
+			"jsx",
+			"json",
+			"node"
+		]
 	},
 	"contributors": [
 		{
@@ -23,11 +41,16 @@
 	],
 	"license": "ISC",
 	"dependencies": {
+		"@types/jest": "^29.5.14",
+		"@types/supertest": "^6.0.2",
 		"chalk": "4.1.2",
 		"dotenv": "^16.3.2",
 		"express": "^4.21.0",
+		"jest": "^29.7.0",
 		"jsonwebtoken": "^9.0.2",
 		"mongoose": "^8.8.1",
+		"supertest": "^7.0.0",
+		"ts-jest": "^29.2.5",
 		"wikipedia": "^2.1.2"
 	},
 	"devDependencies": {

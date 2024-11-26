@@ -7,9 +7,9 @@ import { AddressInfo } from 'net';
 import { eventDelivered, eventfailed, eventSent } from './messageEvent';
 import messageRecevied from './messageRecevied';
 import { log } from './tools/log';
-import { IsPhoneNumber } from './tools/tools';
-import { loadServices } from './tools/utils';
+import { getOrCreateContact, IsPhoneNumber, loadServices } from './tools/tools';
 import router from './router/routes';
+import { sendSms } from './tools/sendSms';
 
 config();
 const app = express();
@@ -41,7 +41,6 @@ if (process.env.JEST_WORKER_ID == undefined) {
 	}
 }
 //////////////////////////Service class/////////////////////////////////////////////
-
 const servicesClass = loadServices();
 //////////////////////////express server/////////////////////////////////////////////
 

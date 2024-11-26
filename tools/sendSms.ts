@@ -3,7 +3,6 @@ import { Message } from '../models/message.model';
 import { User } from '../models/user.model';
 import { log } from './log';
 import { clearPhone } from './tools';
-import { getOrCreateContact } from './utils';
 async function sendSms(
 	contact: InstanceType<typeof Contact>,
 	message: string,

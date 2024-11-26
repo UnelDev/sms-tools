@@ -1,9 +1,7 @@
 import { bgRed, blue, gray, red, yellow } from 'chalk';
-import fs from 'fs';
-import path from 'path';
-import { getFileName } from './tools';
 import mongoose from 'mongoose';
 import { Log } from '../models/logs.model';
+import { getFileName } from './tools';
 
 type WarningLevel = 'DEBUG' | 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL';
 
