@@ -6,10 +6,10 @@ import mongoose from 'mongoose';
 import { AddressInfo } from 'net';
 import { eventDelivered, eventfailed, eventSent } from './messageEvent';
 import messageRecevied from './messageRecevied';
-import { log } from './tools/log';
-import { getOrCreateContact, IsPhoneNumber, loadServices } from './tools/tools';
 import router from './router/routes';
-import { sendSms } from './tools/sendSms';
+import { log } from './tools/log';
+import { IsPhoneNumber, loadServices } from './tools/tools';
+import { SmsSender } from './tools/sendSms';
 
 config();
 const app = express();
@@ -40,8 +40,9 @@ if (process.env.JEST_WORKER_ID == undefined) {
 			});
 	}
 }
-//////////////////////////Service class/////////////////////////////////////////////
+//////////////////////////create class/////////////////////////////////////////////
 const servicesClass = loadServices();
+const smsSender = new SmsSender();
 //////////////////////////express server/////////////////////////////////////////////
 
 const server = https.createServer(
@@ -80,7 +81,7 @@ app.post('/sms', (req, res) => {
 		log('Invalid phone number', 'ERROR', __filename, null, req.hostname);
 		return;
 	}
-	messageRecevied(message, phoneNumber, req.body.id, servicesClass);
+	messageRecevied(message, phoneNumber, req.body.id, servicesClass, smsSender);
 });
 
 app.post('/sent', (req, res) => {

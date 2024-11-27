@@ -1,5 +1,5 @@
-import { sendSms } from '../tools/sendSms';
 import { User } from '../models/user.model';
+import { SmsSender } from '../tools/sendSms';
 class ServicesClass {
 	name: string;
 	description: string;
@@ -15,8 +15,8 @@ class ServicesClass {
 		this.commands = [];
 		this.bypassTrigger = [];
 	}
-	newMessage(contact: InstanceType<typeof User>, message: string) {
-		sendSms(
+	newMessage(contact: InstanceType<typeof User>, message: string, smsSender: SmsSender) {
+		smsSender.sendSms(
 			contact,
 			'your message has been received by ' + this.name + ', but the service has no response to give you',
 			this.name

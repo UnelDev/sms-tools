@@ -1,7 +1,7 @@
 import { Contact } from '../../models/contact.model';
 import { User } from '../../models/user.model';
 import { log } from '../../tools/log';
-import { sendSms } from '../../tools/sendSms';
+import { SmsSender } from '../../tools/sendSms';
 import { IsPhoneNumber, bolderize, getOrCreateContact } from '../../tools/tools';
 import ServicesClass from '../service';
 import { UtilModel } from './utilData.model';
@@ -15,14 +15,14 @@ class Utils extends ServicesClass {
 		this.type = 'command';
 		this.commands = ['1z', '2z', '3z'];
 	}
-	async newMessage(user: InstanceType<typeof User>, message: string) {
+	async newMessage(user: InstanceType<typeof User>, message: string, smsSender: SmsSender) {
 		const Util_Action = (await UtilModel.findOne({ senderID: user._id }, ['Util_Action']))?.Util_Action;
 		if (Util_Action == 'sendat') {
-			this.sendAt(user, message);
+			this.sendAt(user, message, smsSender);
 			return;
 		}
 		if (message == 'ping') {
-			sendSms(user, 'Pong!');
+			smsSender.sendSms(user, 'Pong!');
 		} else if (message.startsWith('sendat')) {
 			await UtilModel.updateOne(
 				{ senderID: user._id },
@@ -30,9 +30,9 @@ class Utils extends ServicesClass {
 				{ upsert: true, setDefaultsOnInsert: true }
 			);
 			message = message.replace('sendat ', '');
-			this.sendAt(user, message);
+			this.sendAt(user, message, smsSender);
 		} else {
-			sendSms(
+			smsSender.sendSms(
 				user,
 				`You have selected the ${bolderize('Util')} service. List of command:
 ${bolderize('ping')}: Reply pong
@@ -43,7 +43,7 @@ ${bolderize('home')}: Go back to the main menu`
 		}
 	}
 
-	private async sendAt(user: InstanceType<typeof User>, message: string) {
+	private async sendAt(user: InstanceType<typeof User>, message: string, smsSender: SmsSender) {
 		const Util_recPhone = (await UtilModel.findOne({ senderID: user._id }, ['Util_recPhone']))?.Util_recPhone;
 		if (!Util_recPhone) {
 			const messageSplit = message.split(' ');
@@ -60,7 +60,7 @@ ${bolderize('home')}: Go back to the main menu`
 				messageSplit.shift();
 				message = messageSplit.join(' ');
 			} else {
-				sendSms(user, 'Send the phone number of the recipient');
+				smsSender.sendSms(user, 'Send the phone number of the recipient');
 				return;
 			}
 		}
@@ -68,7 +68,7 @@ ${bolderize('home')}: Go back to the main menu`
 		const Util_date = (await UtilModel.findOne({ senderID: user._id }, ['Util_date']))?.Util_date;
 		if (!Util_date) {
 			if (message.trim() == '') {
-				sendSms(user, 'Select the date the message should be sent. eg: 20/12/23 23:28 or now');
+				smsSender.sendSms(user, 'Select the date the message should be sent. eg: 20/12/23 23:28 or now');
 				return;
 			}
 			const messageSplit = message.split(' ');
@@ -77,11 +77,11 @@ ${bolderize('home')}: Go back to the main menu`
 				this.ConvertInMs(messageSplit[0] + ' ' + messageSplit[1]);
 			}
 			if (!date) {
-				sendSms(user, 'Invalid date, retry... eg: 20/12/23 23:28 or now');
+				smsSender.sendSms(user, 'Invalid date, retry... eg: 20/12/23 23:28 or now');
 				return;
 			}
 			if (date.getTime() - Date.now() < 0) {
-				sendSms(user, 'This date is in the past, try another one. eg: 20/12/23 23:28');
+				smsSender.sendSms(user, 'This date is in the past, try another one. eg: 20/12/23 23:28');
 				return;
 			}
 
@@ -106,7 +106,7 @@ ${bolderize('home')}: Go back to the main menu`
 				const req = await UtilModel.findOne({ senderID: user._id }, ['Util_recPhone', 'Util_date']);
 				const Util_date = req?.Util_date;
 				const Util_recPhone = req?.Util_recPhone;
-				sendSms(
+				smsSender.sendSms(
 					user,
 					`You want to send: "${message.trim()}"
 to the "${Util_recPhone}"
@@ -115,7 +115,7 @@ this messge will be sent at ${Util_date?.toLocaleString('en-GB')}
 y/n`
 				);
 			} else {
-				sendSms(user, 'Send the message');
+				smsSender.sendSms(user, 'Send the message');
 				return;
 			}
 			return;
@@ -128,17 +128,17 @@ y/n`
 			const Util_Message = req?.Util_Message;
 			const contact = await getOrCreateContact(Util_recPhone ?? '');
 			if (Util_date?.getTime() ?? 0 - Date.now() < 0) {
-				await this.send(contact, Util_Message ?? '', user, Util_recPhone);
+				await this.send(contact, Util_Message ?? '', user, Util_recPhone, smsSender);
 			} else {
 				setTimeout(
-					async () => await this.send(contact, Util_Message ?? '', user, Util_recPhone),
+					async () => await this.send(contact, Util_Message ?? '', user, Util_recPhone, smsSender),
 					Util_date?.getTime() ?? 0 - Date.now()
 				);
 			}
 		} else {
 			await UtilModel.deleteOne({ senderID: user._id });
-			sendSms(user, 'message aborted.');
-			this.newMessage(user, '');
+			smsSender.sendSms(user, 'message aborted.');
+			this.newMessage(user, '', smsSender);
 		}
 	}
 
@@ -146,18 +146,19 @@ y/n`
 		contact: InstanceType<typeof Contact> | undefined,
 		Util_Message: String,
 		user: InstanceType<typeof User>,
-		Util_recPhone: string | null | undefined
+		Util_recPhone: string | null | undefined,
+		smsSender: SmsSender
 	) {
 		if (contact) {
-			sendSms(contact, Util_Message + '\n\n' + bolderize('This message is forwarded. Do not reply'));
-			sendSms(user, 'message send');
+			smsSender.sendSms(contact, Util_Message + '\n\n' + bolderize('This message is forwarded. Do not reply'));
+			smsSender.sendSms(user, 'message send');
 			await UtilModel.deleteOne({ senderID: user._id });
-			this.newMessage(user, '');
+			this.newMessage(user, '', smsSender);
 		} else {
 			log('error on create contact', 'ERROR', __filename, { Util_recPhone, contact });
-			sendSms(user, 'error on send, contact administrator');
+			smsSender.sendSms(user, 'error on send, contact administrator');
 			await UtilModel.deleteOne({ senderID: user._id });
-			this.newMessage(user, '');
+			this.newMessage(user, '', smsSender);
 		}
 	}
 

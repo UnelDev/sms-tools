@@ -1,14 +1,15 @@
 import { Message } from './models/message.model';
 import ServicesClass from './services/service';
 import { log } from './tools/log';
-import { sendSms } from './tools/sendSms';
+import { SmsSender } from './tools/sendSms';
 import { bolderize, clearPhone, createUser, getUser } from './tools/tools';
 
 async function messageRecevied(
 	message: string,
 	phoneNumber: string,
 	messageId: string,
-	servicesClass: Promise<Array<ServicesClass>>
+	servicesClass: Promise<Array<ServicesClass>>,
+	smsSender: SmsSender
 ) {
 	message = message.trim().toLowerCase();
 	const phone = clearPhone(phoneNumber);
@@ -56,7 +57,7 @@ async function messageRecevied(
 					{ message, user, serv },
 					serv.name
 				);
-				serv.newMessage(user, message);
+				serv.newMessage(user, message, smsSender);
 			}
 		});
 		//if user is in service
@@ -64,7 +65,7 @@ async function messageRecevied(
 			const service = (await servicesClass).find(e => e.name == user.currentServices);
 			if (!service) user.currentServices == 'nothing';
 			else {
-				service.newMessage(user, message);
+				service.newMessage(user, message, smsSender);
 				return;
 			}
 		}
@@ -80,7 +81,7 @@ async function messageRecevied(
 				//if only one argument
 				if (messageSplit.length == 1) {
 					log('user is enter in services', 'INFO', __filename, { user, service });
-					service.newMessage(user, messageSplit.slice(1).join(' '));
+					service.newMessage(user, messageSplit.slice(1).join(' '), smsSender);
 				}
 				return;
 			}
@@ -94,14 +95,14 @@ async function messageRecevied(
 				//if only one argument
 				if (messageSplit.length == 1) {
 					log('user is enter in services', 'INFO', __filename, { user, serv });
-					serv.newMessage(user, messageSplit.slice(1).join(' '));
+					serv.newMessage(user, messageSplit.slice(1).join(' '), smsSender);
 				}
 				return;
 			}
 		}
 
 		//other case
-		sendSms(
+		smsSender.sendSms(
 			user,
 			`Select an application:
 ${(await servicesClass).map((el, i) => {
@@ -113,7 +114,7 @@ ${bolderize('home')}: return on this menu`
 		(await servicesClass).forEach(async serv => {
 			if (serv.type == 'message') {
 				log(`Message transfered to ${serv.name}`, 'INFO', __filename, { message, user, serv }, serv.name);
-				serv.newMessage(user, message);
+				serv.newMessage(user, message, smsSender);
 			}
 		});
 	}
