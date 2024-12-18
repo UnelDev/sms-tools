@@ -8,8 +8,9 @@ import { eventDelivered, eventfailed, eventSent } from './messageEvent';
 import messageRecevied from './messageRecevied';
 import router from './router/routes';
 import { log } from './tools/log';
-import { IsPhoneNumber, loadServices } from './tools/tools';
 import { SmsSender } from './tools/sendSms';
+import { clearPhone, getOrCreateUser, IsPhoneNumber, loadServices } from './tools/tools';
+import getNewMessage from './router/getNewMessage';
 
 config();
 const app = express();
@@ -43,6 +44,7 @@ if (process.env.JEST_WORKER_ID == undefined) {
 //////////////////////////create class/////////////////////////////////////////////
 const servicesClass = loadServices();
 const smsSender = new SmsSender();
+const SseSuscriber = new Map<mongoose.Types.ObjectId, Array<(message: string) => void>>(); // Map<phone, sseSender>;
 //////////////////////////express server/////////////////////////////////////////////
 
 const server = https.createServer(
@@ -62,7 +64,7 @@ app.post('/', async (req, res) => {
 	log('root page accessed', 'INFO', __filename, null, req.hostname);
 });
 
-app.post('/sms', (req, res) => {
+app.post('/sms', async (req, res) => {
 	res.status(200).send();
 	if (typeof req.body.payload.message !== 'string' || typeof req.body.payload.phoneNumber !== 'string') {
 		log('Invalid request body', 'ERROR', __filename, null, req.hostname);
@@ -81,7 +83,24 @@ app.post('/sms', (req, res) => {
 		log('Invalid phone number', 'ERROR', __filename, null, req.hostname);
 		return;
 	}
-	messageRecevied(message, phoneNumber, req.body.id, servicesClass, smsSender);
+
+	//create user
+	const phone = clearPhone(phoneNumber);
+	if (!phone) {
+		log('Bad phone:', 'ERROR', __filename, phone, 'root');
+		return;
+	}
+	const user = await getOrCreateUser(phone);
+	if (!user) {
+		log('error for create user', 'WARNING', __filename);
+		return;
+	}
+
+	//send to all sse suscrible client
+	if (SseSuscriber.has(user._id)) SseSuscriber.get(user._id)?.forEach(f => f(message));
+
+	//pass to other app
+	messageRecevied(message, user, req.body.id, servicesClass, smsSender);
 });
 
 app.post('/sent', (req, res) => {
@@ -110,4 +129,6 @@ app.post('/failed', (req, res) => {
 	}
 	eventfailed(req.body.payload.messageId, new Date(), req.body.payload.reason);
 });
+
+app.get('/getNewMessage', (req, res) => getNewMessage(req, res, SseSuscriber));
 app.use(router);

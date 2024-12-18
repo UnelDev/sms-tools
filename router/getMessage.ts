@@ -19,6 +19,9 @@ async function getMessage(req: Request<any>, res: Response<any>) {
 		)
 	)
 		return;
+	if (req.body.size && req.body.size > 200) {
+		res.status(418).send('to big request');
+	}
 	const size = req.body.size ?? 50;
 	const msgList: Array<InstanceType<typeof Message>> = [];
 	await Message.find({ contactID: req.body.ContactID }, null, {

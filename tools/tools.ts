@@ -1,4 +1,3 @@
-import { User } from '../models/user.model';
 import ServicesClass from '../services/service';
 import { Contact } from '../models/contact.model';
 import path from 'path';
@@ -6,6 +5,7 @@ import fs from 'node:fs';
 import { log } from './log';
 import mongoose from 'mongoose';
 import { Response } from 'express';
+import { User } from '../models/user.model';
 /**
  * Converts the input text to a bold Unicode variant.
  *
@@ -175,6 +175,12 @@ async function getOrCreateContact(phoneNumber: string): Promise<InstanceType<typ
 	return contact;
 }
 
+async function getOrCreateUser(phoneNumber: string) {
+	let User = await getUser(phoneNumber);
+	if (!User) User = await createUser(phoneNumber);
+	return User;
+}
+
 /**
  * Check if the parameters are in the body
  * @param body
@@ -265,6 +271,7 @@ function checkParameters(
 	return true;
 }
 export {
+	getOrCreateUser,
 	bolderize,
 	clearPhone,
 	getFileName,

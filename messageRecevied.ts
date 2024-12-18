@@ -1,32 +1,19 @@
 import { Message } from './models/message.model';
+import { User } from './models/user.model';
 import ServicesClass from './services/service';
 import { log } from './tools/log';
 import { SmsSender } from './tools/sendSms';
-import { bolderize, clearPhone, createUser, getUser } from './tools/tools';
+import { bolderize } from './tools/tools';
 
 async function messageRecevied(
 	message: string,
-	phoneNumber: string,
+	user: InstanceType<typeof User>,
 	messageId: string,
 	servicesClass: Promise<Array<ServicesClass>>,
 	smsSender: SmsSender
 ) {
 	message = message.trim().toLowerCase();
-	const phone = clearPhone(phoneNumber);
-	if (!phone) {
-		log('Bad phone:', 'ERROR', __filename, phone, 'root');
-		return;
-	}
-	let user = await getUser(phone);
-	if (!user) {
-		const usr = await createUser(phone);
-		if (usr) {
-			user = usr;
-		} else {
-			log('error on creating user', 'CRITICAL', __filename, { phone, message });
-			return;
-		}
-	}
+
 	log(`Message received`, 'INFO', __filename, { message, user }, user?._id.toString());
 	const messageObj = new Message({
 		senderID: user._id,
