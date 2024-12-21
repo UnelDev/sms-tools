@@ -11,10 +11,12 @@ import { log } from './tools/log';
 import { SmsSender } from './tools/sendSms';
 import { clearPhone, getOrCreateUser, IsPhoneNumber, loadServices } from './tools/tools';
 import getNewMessage from './router/getNewMessage';
+import cors from 'cors';
 
 config();
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 //////////////////////////data base/////////////////////////////////////////////
 
