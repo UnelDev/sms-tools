@@ -14,7 +14,7 @@ async function getProgress(req: Request<any>, res: Response<any>) {
 		{ $count: 'uniqueClients' }
 	]);
 
-	res.status(200).send({ message: 'nbUser', data: count[0]?.uniqueClients || 0, OK: true });
+	res.status(200).send({ message: 'nbUser', data: { total: count[0]?.uniqueClients || 0 }, OK: true });
 	log('user get the number of client', 'INFO', __dirname, { user }, user.id);
 }
 

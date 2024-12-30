@@ -18,7 +18,7 @@ function authenticate(
 
 	if (!token) {
 		log('Acces denied', 'WARNING', __filename, { ip: req.hostname });
-		res.status(400).send({ message: `Acces denied`, OK: false });
+		res.status(401).send({ message: `Access denied`, OK: false });
 		return undefined;
 	}
 	const usr:

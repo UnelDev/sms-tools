@@ -34,14 +34,17 @@ async function login(req: Request<any>, res: Response<any>) {
 	const foundUser = await User.findOne({ phoneNumber, password });
 	if (foundUser) {
 		const user = { id: foundUser._id, phoneNumber };
-		const token = jwt.sign(user, process.env.privateJWTkey ?? 'error', { expiresIn: '1h' });
-		res.json({ token });
+		const token = jwt.sign(user, process.env.privateJWTkey ?? 'error', { expiresIn: '1d' });
+		const exp = new Date();
+		exp.setHours(exp.getHours() + 24);
+		res.json({ token, exp });
 		log(`login for user ${user.id}`, 'INFO', __filename, {
 			user,
 			ip: req.hostname
 		});
 	} else {
-		res.status(401).send('Invalid credentials');
+		console.log(req.body);
+		res.status(401).json({ OK: false, message: 'bad phone number or password' });
 		log(`Failed login attempt for phone number: ${req.body.phone}`, 'WARNING', __filename, {
 			phone: req.body.phone,
 			ip: req.hostname

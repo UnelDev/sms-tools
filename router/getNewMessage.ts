@@ -10,8 +10,8 @@ async function getNewMessage(
 	SseSuscriber: Map<mongoose.Types.ObjectId, Array<(message: string) => void>>
 ) {
 	req.body.ContactID = '67463daade8609f23e827fb7';
-	// const user = authenticate(req, res);
-	// if (!user || !checkParameters(req.body, res, [['ContactID', 'ObjectId']], __filename)) return;
+	const user = authenticate(req, res);
+	if (!user || !checkParameters(req.body, res, [['ContactID', 'ObjectId']], __filename)) return;
 
 	res.writeHead(200, {
 		Connection: 'keep-alive',
