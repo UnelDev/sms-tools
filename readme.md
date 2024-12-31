@@ -75,6 +75,25 @@ npm start
 
 for save more data on user, create our own services data model, conventionaly create nameData.model.ts in your service folder
 
+### custom service with router
+
+you canadd services with router, for this create a file routes.ts in your service folder
+this file must export a function with the router
+
+```typescript
+import { Router } from 'express';
+import login from './router/login';
+
+const router = Router();
+router.post('/hello', (req, res) => {
+	res.send('hello world');
+});
+
+export default router;
+```
+
+for acces to this route, the link is /{service_name}/hello
+
 # Usage
 
 todo chained comand

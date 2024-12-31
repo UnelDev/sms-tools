@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/user.model';
-import { checkParameters, clearPhone } from '../tools/tools';
-import { log } from '../tools/log';
+import { User } from '../../../models/user.model';
+import { checkParameters, clearPhone } from '../../../tools/tools';
+import { log } from '../../../tools/log';
 /**
  * Handles user login by verifying the provided phone number and password.
  * If the credentials are valid, a JWT token is generated and returned.

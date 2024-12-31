@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import authenticate from '../tools/authentificate';
-import { Message } from '../models/message.model';
-import { log } from '../tools/log';
+import authenticate from '../../../tools/authentificate';
+import { Message } from '../../../models/message.model';
+import { log } from '../../../tools/log';
 
 async function getProgress(req: Request<any>, res: Response<any>) {
 	req.body.ContactID = '67463daade8609f23e827fb7';

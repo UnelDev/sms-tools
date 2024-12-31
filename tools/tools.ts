@@ -1,11 +1,11 @@
-import ServicesClass from '../services/service';
-import { Contact } from '../models/contact.model';
-import path from 'path';
-import fs from 'node:fs';
-import { log } from './log';
+import { RequestHandler, Response, Express } from 'express';
 import mongoose from 'mongoose';
-import { Response } from 'express';
+import fs from 'node:fs';
+import path from 'path';
+import { Contact } from '../models/contact.model';
 import { User } from '../models/user.model';
+import ServicesClass from '../services/service';
+import { log } from './log';
 /**
  * Converts the input text to a bold Unicode variant.
  *
@@ -107,7 +107,7 @@ async function getUser(phoneNumber: string): Promise<InstanceType<typeof User> |
 	return user;
 }
 
-async function loadServices(): Promise<Array<ServicesClass>> {
+async function loadServices(expressServer: Express): Promise<Array<ServicesClass>> {
 	const services: Array<ServicesClass> = [];
 	const servicesDir = path.resolve(__dirname, '../services');
 
@@ -120,14 +120,23 @@ async function loadServices(): Promise<Array<ServicesClass>> {
 			const servicePath = path.join(servicesDir, dir.name, dir.name + '.ts');
 			try {
 				const module = await import(servicePath);
-
 				if (module.default) {
 					services.push(new module.default());
 				} else {
 					log(`no class found on ${dir.name}`, 'ERROR', __filename);
 				}
+				const routerPath = path.join(servicesDir, dir.name, 'routes.ts');
+				if (fs.existsSync(routerPath)) {
+					const router = await import(routerPath);
+					if (router.default) {
+						expressServer.use('/' + dir.name, router.default);
+						log(`new router added from ${routerPath} services`, 'INFO', __filename);
+					} else {
+						log(`no router found on ${routerPath}`, 'ERROR', __filename);
+					}
+				}
 			} catch (error) {
-				log(`error on import of ${dir.name}`, 'ERROR', __filename);
+				log(`error on import of ${dir.name}`, 'ERROR', __filename, { error });
 			}
 		}
 	} catch (error) {
@@ -271,17 +280,17 @@ function checkParameters(
 	return true;
 }
 export {
-	getOrCreateUser,
 	bolderize,
+	checkParameters,
 	clearPhone,
-	getFileName,
-	IsPhoneNumber,
-	phoneNumberCheck,
-	getContact,
-	getUser,
-	loadServices,
 	createContact,
 	createUser,
+	getContact,
+	getFileName,
 	getOrCreateContact,
-	checkParameters
+	getOrCreateUser,
+	getUser,
+	IsPhoneNumber,
+	loadServices,
+	phoneNumberCheck
 };

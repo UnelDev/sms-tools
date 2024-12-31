@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import authenticate from '../tools/authentificate';
-import { checkParameters } from '../tools/tools';
-import { log } from '../tools/log';
+import authenticate from '../../../tools/authentificate';
+import { checkParameters } from '../../../tools/tools';
+import { log } from '../../../tools/log';
 
 async function getNewMessage(
 	req: Request<any>,

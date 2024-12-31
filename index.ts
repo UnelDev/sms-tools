@@ -6,11 +6,11 @@ import mongoose from 'mongoose';
 import { AddressInfo } from 'net';
 import { eventDelivered, eventfailed, eventSent } from './messageEvent';
 import messageRecevied from './messageRecevied';
-import router from './router/routes';
+import router from './services/api/routes';
 import { log } from './tools/log';
 import { SmsSender } from './tools/sendSms';
 import { clearPhone, getOrCreateUser, IsPhoneNumber, loadServices } from './tools/tools';
-import getNewMessage from './router/getNewMessage';
+import getNewMessage from './services/api/router/getNewMessage';
 import cors from 'cors';
 
 config();
@@ -43,10 +43,6 @@ if (process.env.JEST_WORKER_ID == undefined) {
 			});
 	}
 }
-//////////////////////////create class/////////////////////////////////////////////
-const servicesClass = loadServices();
-const smsSender = new SmsSender();
-const SseSuscriber = new Map<mongoose.Types.ObjectId, Array<(message: string) => void>>(); // Map<phone, sseSender>;
 //////////////////////////express server/////////////////////////////////////////////
 
 const server = https.createServer(
@@ -133,4 +129,9 @@ app.post('/failed', (req, res) => {
 });
 
 app.get('/getNewMessage', (req, res) => getNewMessage(req, res, SseSuscriber));
-app.use(router);
+//app.use(router);
+
+//////////////////////////create class/////////////////////////////////////////////
+const servicesClass = loadServices(app);
+const smsSender = new SmsSender();
+const SseSuscriber = new Map<mongoose.Types.ObjectId, Array<(message: string) => void>>(); // Map<phone, sseSender>;

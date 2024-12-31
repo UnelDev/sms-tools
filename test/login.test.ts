@@ -3,7 +3,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import request from 'supertest';
 import { User } from '../models/user.model';
-import login from '../router/login';
+import login from '../services/api/router/login';
 
 config();
 const app = express();

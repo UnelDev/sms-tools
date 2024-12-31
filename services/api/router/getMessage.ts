@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { Message } from '../models/message.model';
-import authenticate from '../tools/authentificate';
-import { checkParameters } from '../tools/tools';
+import { Message } from '../../../models/message.model';
+import authenticate from '../../../tools/authentificate';
+import { checkParameters, clearPhone, getUser } from '../../../tools/tools';
 
 async function getMessage(req: Request<any>, res: Response<any>) {
 	const user = authenticate(req, res);
@@ -11,7 +11,8 @@ async function getMessage(req: Request<any>, res: Response<any>) {
 			req.body,
 			res,
 			[
-				['ContactID', 'ObjectId'],
+				['ContactID', 'ObjectId', true],
+				['phoneNumber', 'string', true],
 				['page', 'number', true],
 				['size', 'number', true]
 			],
@@ -21,7 +22,24 @@ async function getMessage(req: Request<any>, res: Response<any>) {
 		return;
 	if (req.body.size && req.body.size > 200) {
 		res.status(418).send('to big request');
+		return;
 	}
+
+	if (!req.body.ContactID && !req.body.phoneNumber) {
+		res.status(400).send('at least one of these two arguments must be provided: ContactID, phoneNumber');
+		return;
+	}
+
+	if (!req.body.ContactID) {
+		const phone = clearPhone(req.body.phoneNumber);
+		const user = await getUser(phone);
+		if (!user || user._id) {
+			res.status(404).json({ OK: false, message: 'no user found' });
+			return;
+		}
+		req.body.ContactID = user._id;
+	}
+
 	const size = req.body.size ?? 50;
 	const msgList: Array<InstanceType<typeof Message>> = [];
 	await Message.find({ contactID: req.body.ContactID }, null, {

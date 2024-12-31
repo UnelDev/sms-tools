@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import getMessage from './getMessage';
-import getProgress from './getProgress';
-import login from './login';
+import getMessage from './router/getMessage';
+import getProgress from './router/getProgress';
+import login from './router/login';
 
 const router = Router();
 router.post('/login', login);
