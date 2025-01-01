@@ -1,37 +1,88 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { checkParameters, clearPhone, getContact, phoneNumberCheck } from '../../../tools/tools';
 import authenticate from '../authentificate';
-import { checkParameters } from '../../../tools/tools';
 import { log } from '../../../tools/log';
 
 async function getNewMessage(
 	req: Request<any>,
 	res: Response<any>,
-	SseSuscriber: Map<mongoose.Types.ObjectId, Array<(message: string) => void>>
+	SseSubscribers: Map<string, Array<(message: string) => void>>
 ) {
-	req.body.ContactID = '67463daade8609f23e827fb7';
-	const user = authenticate(req, res);
-	if (!user || !checkParameters(req.body, res, [['ContactID', 'ObjectId']], __filename)) return;
+	try {
+		const user = authenticate(req, res);
+		if (!user) return;
 
-	res.writeHead(200, {
-		Connection: 'keep-alive',
-		'Cache-Control': 'no-cache',
-		'Content-Type': 'text/event-stream'
-	}); // flush the headers to establish SSE with client
+		const isValid = checkParameters(
+			req.body,
+			res,
+			[
+				['ContactID', 'ObjectId', true],
+				['phoneNumber', 'string', true]
+			],
+			__filename
+		);
+		if (!isValid) return;
 
-	if (SseSuscriber.has(req.body.ContactID)) {
-		const suscribe = SseSuscriber.get(req.body.ContactID) ?? new Array<() => void>();
-		suscribe?.push((message: string) => {
-			console.log('ress send');
-			res.write(`data: ${JSON.stringify(message)}\n\n`);
+		let contactId = req.body.ContactID;
+
+		if (!contactId && req.body.phoneNumber) {
+			const phone = clearPhone(req.body.phoneNumber);
+			if (!phoneNumberCheck(phone)) {
+				log('Invalid phone number provided', 'WARNING', __filename, {}, user.id);
+				return res.status(400).json({ OK: false, message: 'Invalid phone number' });
+			}
+
+			const contact = await getContact(phone);
+			if (!contact || !contact._id) {
+				log('Contact not found', 'WARNING', __filename, { phone }, user.id);
+				return res.status(404).json({ OK: false, message: 'Contact not found' });
+			}
+
+			contactId = contact._id.toString();
+		}
+
+		if (!contactId) {
+			log('Missing required parameters', 'WARNING', __filename, { phone: req.body.phoneNumber }, user.id);
+			return res.status(400).send('At least one of these parameters must be provided: ContactID, phoneNumber');
+		}
+
+		// write header for sse
+		res.writeHead(200, {
+			Connection: 'keep-alive',
+			'Cache-Control': 'no-cache',
+			'Content-Type': 'text/event-stream'
 		});
-		SseSuscriber.set(req.body.ContactID, suscribe);
-	}
+		log('Client connected to SSE', 'INFO', __filename, { contactId }, user.id);
 
-	res.on('close', () => {
-		// log('client of sse droped connection', 'INFO', __filename, { id: user.id });
-		res.end();
-	});
+		// aff callback to sse shared object
+		const subscribers = SseSubscribers.get(contactId.toString()) || [];
+		const sendMessage = (message: string) => {
+			try {
+				console.log('sse send');
+				res.write(`${JSON.stringify(message)}`);
+			} catch (error) {
+				log('Error sending SSE message', 'ERROR', __filename, { contactId, error }, user.id);
+			}
+		};
+		subscribers.push(sendMessage);
+		SseSubscribers.set(contactId.toString(), subscribers);
+
+		// if client is desconected
+		res.on('close', () => {
+			log('Client disconnected from SSE', 'INFO', __filename, { contactId }, user.id);
+			const updatedSubscribers = SseSubscribers.get(contactId.toString())?.filter(cb => cb !== sendMessage);
+			if (updatedSubscribers?.length) {
+				SseSubscribers.set(contactId.toString(), updatedSubscribers);
+			} else {
+				SseSubscribers.delete(contactId.toString());
+			}
+			res.end();
+		});
+	} catch (error) {
+		log('Error in getNewMessage', 'ERROR', __filename, { error }, 'system');
+		res.status(500).json({ OK: false, message: 'Internal server error' });
+	}
 }
 
 export default getNewMessage;

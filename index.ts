@@ -1,3 +1,4 @@
+import cors from 'cors';
 import { config } from 'dotenv';
 import express from 'express';
 import fs from 'fs';
@@ -6,18 +7,18 @@ import mongoose from 'mongoose';
 import { AddressInfo } from 'net';
 import { eventDelivered, eventfailed, eventSent } from './messageEvent';
 import messageRecevied from './messageRecevied';
-import router from './services/api/routes';
+import getNewMessage from './services/api/router/getNewMessage';
 import { log } from './tools/log';
 import { SmsSender } from './tools/sendSms';
-import { clearPhone, getOrCreateUser, IsPhoneNumber, loadServices } from './tools/tools';
-import getNewMessage from './services/api/router/getNewMessage';
-import cors from 'cors';
+import { clearPhone, getOrCreateContact, IsPhoneNumber, loadServices } from './tools/tools';
 
 config();
 const app = express();
 app.use(express.json());
 app.use(cors());
 
+//////////////////////////create sse object/////////////////////////////////////////////
+const SseSuscriber = new Map<string, Array<(message: string) => void>>(); // Map<phone, sseSender>;
 //////////////////////////data base/////////////////////////////////////////////
 
 // in test, the test script will create the connection to the database
@@ -88,17 +89,18 @@ app.post('/sms', async (req, res) => {
 		log('Bad phone:', 'ERROR', __filename, phone, 'root');
 		return;
 	}
-	const user = await getOrCreateUser(phone);
-	if (!user) {
+	const contact = await getOrCreateContact(phone);
+	if (!contact) {
 		log('error for create user', 'WARNING', __filename);
 		return;
 	}
 
 	//send to all sse suscrible client
-	if (SseSuscriber.has(user._id)) SseSuscriber.get(user._id)?.forEach(f => f(message));
+	console.log(SseSuscriber, contact._id, SseSuscriber.get(contact._id.toString()));
+	if (SseSuscriber.has(contact._id.toString())) SseSuscriber.get(contact._id.toString())?.forEach(f => f(message));
 
 	//pass to other app
-	messageRecevied(message, user, req.body.id, servicesClass, smsSender);
+	messageRecevied(message, contact, req.body.id, servicesClass, smsSender);
 });
 
 app.post('/sent', (req, res) => {
@@ -133,5 +135,4 @@ app.get('/getNewMessage', (req, res) => getNewMessage(req, res, SseSuscriber));
 
 //////////////////////////create class/////////////////////////////////////////////
 const smsSender = new SmsSender();
-const servicesClass = loadServices(app);
-const SseSuscriber = new Map<mongoose.Types.ObjectId, Array<(message: string) => void>>(); // Map<phone, sseSender>;
+const servicesClass = loadServices(app, SseSuscriber);

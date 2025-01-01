@@ -107,7 +107,10 @@ async function getUser(phoneNumber: string): Promise<InstanceType<typeof User> |
 	return user;
 }
 
-async function loadServices(expressServer: Express): Promise<Array<ServicesClass>> {
+async function loadServices(
+	expressServer: Express,
+	SseSuscriber: Map<string, Array<(message: string) => void>>
+): Promise<Array<ServicesClass>> {
 	const services: Array<ServicesClass> = [];
 	const servicesDir = path.resolve(__dirname, '../services');
 
@@ -119,17 +122,22 @@ async function loadServices(expressServer: Express): Promise<Array<ServicesClass
 		for (const dir of dirs) {
 			const servicePath = path.join(servicesDir, dir.name, dir.name + '.ts');
 			try {
+				//import class
 				const module = await import(servicePath);
 				if (module.default) {
+					//if import default works
 					services.push(new module.default());
 				} else {
 					log(`no class found on ${dir.name}`, 'ERROR', __filename);
 				}
+				//for router: check if this services have an router
 				const routerPath = path.join(servicesDir, dir.name, 'routes.ts');
 				if (fs.existsSync(routerPath)) {
+					//import router file
 					const router = await import(routerPath);
 					if (router.default) {
-						expressServer.use('/' + dir.name, router.default);
+						// use routes /name/helloWorld . inject SseSuscriber if sse subscription is requied
+						expressServer.use('/' + dir.name, router.default(SseSuscriber));
 						log(`new router added from ${routerPath} services`, 'INFO', __filename);
 					} else {
 						log(`no router found on ${routerPath}`, 'ERROR', __filename);

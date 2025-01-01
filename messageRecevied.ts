@@ -1,22 +1,23 @@
+import { Contact } from './models/contact.model';
 import { Message } from './models/message.model';
 import { User } from './models/user.model';
 import ServicesClass from './services/service';
 import { log } from './tools/log';
 import { SmsSender } from './tools/sendSms';
-import { bolderize, getOrCreateContact } from './tools/tools';
+import { bolderize, getOrCreateContact, getOrCreateUser } from './tools/tools';
 
 async function messageRecevied(
 	message: string,
-	user: InstanceType<typeof User>,
+	contact: InstanceType<typeof Contact>,
 	messageId: string,
 	servicesClass: Promise<Array<ServicesClass>>,
 	smsSender: SmsSender
 ) {
 	message = message.trim().toLowerCase();
-	log(`Message received`, 'INFO', __filename, { message, user }, user?._id.toString());
-	const contact = await getOrCreateContact(user.phoneNumber);
-	if (!contact) {
-		log('error in creating contact', 'ERROR', __filename, { user, contact }, user.id);
+	log(`Message received`, 'INFO', __filename, { message, user: contact }, contact?._id.toString());
+	const user = await getOrCreateUser(contact.phoneNumber);
+	if (!user) {
+		log('error in creating contact', 'ERROR', __filename, { user: user, contact }, contact.id);
 		return;
 	}
 	const messageObj = new Message({
@@ -35,7 +36,7 @@ async function messageRecevied(
 		message = message.trim();
 		user.currentServices = 'nothing';
 		await user.save();
-		log('user is go to home menu', 'INFO', __filename, { user });
+		log('user is go to home menu', 'INFO', __filename, { user: user });
 	}
 
 	if (user.commandPermeted) {
@@ -46,7 +47,7 @@ async function messageRecevied(
 					`Message transfered for bypass to ${serv.name}`,
 					'INFO',
 					__filename,
-					{ message, user, serv },
+					{ message, user: contact, serv },
 					serv.name
 				);
 				serv.newMessage(user, message, smsSender);
@@ -72,7 +73,7 @@ async function messageRecevied(
 				await user.updateOne({ currentServices: service.name });
 				//if only one argument
 				if (messageSplit.length == 1) {
-					log('user is enter in services', 'INFO', __filename, { user, service });
+					log('user is enter in services', 'INFO', __filename, { user: user, service });
 					service.newMessage(user, messageSplit.slice(1).join(' '), smsSender);
 				}
 				return;
@@ -86,7 +87,7 @@ async function messageRecevied(
 				await user.updateOne({ currentServices: serv.name });
 				//if only one argument
 				if (messageSplit.length == 1) {
-					log('user is enter in services', 'INFO', __filename, { user, serv });
+					log('user is enter in services', 'INFO', __filename, { user: user, serv });
 					serv.newMessage(user, messageSplit.slice(1).join(' '), smsSender);
 				}
 				return;
@@ -105,7 +106,7 @@ ${bolderize('home')}: return on this menu`
 	} else {
 		(await servicesClass).forEach(async serv => {
 			if (serv.type == 'message') {
-				log(`Message transfered to ${serv.name}`, 'INFO', __filename, { message, user, serv }, serv.name);
+				log(`Message transfered to ${serv.name}`, 'INFO', __filename, { message, user: user, serv }, serv.name);
 				serv.newMessage(user, message, smsSender);
 			}
 		});
