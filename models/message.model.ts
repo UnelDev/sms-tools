@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const MessageModel = new mongoose.Schema({
 	date: { type: Date, default: new Date() },
 	contactID: { type: mongoose.Schema.ObjectId, ref: 'Contact', required: false },
-	senderID: { type: mongoose.Schema.ObjectId, ref: 'User', required: false },
+	userID: { type: mongoose.Schema.ObjectId, ref: 'User', required: false },
 	message: { type: String, required: true },
 	direction: { type: Boolean, required: true }, // in or out in: true, out: false
 	status: {

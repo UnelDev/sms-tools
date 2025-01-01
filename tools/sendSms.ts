@@ -3,7 +3,7 @@ import { Contact } from '../models/contact.model';
 import { Message } from '../models/message.model';
 import { User } from '../models/user.model';
 import { log } from './log';
-import { clearPhone } from './tools';
+import { clearPhone, getOrCreateContact } from './tools';
 class SmsSender {
 	timeBetwenSend: number;
 	pending: Array<{
@@ -60,22 +60,10 @@ class SmsSender {
 	}
 
 	async sendSms(
-		contact: InstanceType<typeof Contact>,
-		message: string,
-		initiator?: string,
-		sendUser?: InstanceType<typeof User>
-	): Promise<void>;
-	async sendSms(
-		contact: InstanceType<typeof User>,
-		message: string,
-		initiator?: string,
-		sendUser?: InstanceType<typeof User>
-	): Promise<void>;
-	async sendSms(
 		contact: InstanceType<typeof Contact> | InstanceType<typeof User>,
 		message: string,
-		initiator: string = 'root',
-		sendUser?: InstanceType<typeof User>
+		user?: InstanceType<typeof User>,
+		initiator: string = 'root'
 	): Promise<void> {
 		const phone = clearPhone(contact.phoneNumber);
 		if (!phone) {
@@ -83,11 +71,21 @@ class SmsSender {
 			return;
 		}
 
+		if (contact instanceof User) {
+			const createdConact = await getOrCreateContact(contact.phoneNumber);
+			if (!createdConact) {
+				log('error in sending to user, no client created', 'ERROR', __filename, { contact, createdConact });
+				return;
+			}
+
+			contact = createdConact;
+		}
 		const messageObj = new Message({
 			contactID: contact._id,
 			message,
 			direction: false,
-			sendUser
+			userID: user,
+			initiator
 		}).save();
 
 		this.pending.push({ phoneNumber: phone, message, messageObj });

@@ -136,6 +136,7 @@ async function loadServices(expressServer: Express): Promise<Array<ServicesClass
 					}
 				}
 			} catch (error) {
+				console.error(error);
 				log(`error on import of ${dir.name}`, 'ERROR', __filename, { error });
 			}
 		}

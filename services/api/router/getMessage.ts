@@ -26,33 +26,35 @@ async function getMessage(req: Request<any>, res: Response<any>) {
 		res.status(418).send('to big request');
 		return;
 	}
+	let contact = req.body.contactID;
 
-	if (!req.body.ContactID && !req.body.phoneNumber) {
+	if (!contact && !req.body.phoneNumber) {
 		log('no mutch argument', 'WARNING', __filename, { size: req.body.size }, user.id);
 		res.status(400).send('at least one of these two arguments must be provided: ContactID, phoneNumber');
 		return;
 	}
 
-	if (!req.body.ContactID) {
+	if (!contact) {
 		const phone = clearPhone(req.body.phoneNumber);
 		if (!phoneNumberCheck(phone)) {
 			log('bad contact phone number', 'WARNING', __filename, { size: req.body.size }, user.id);
 			res.status(400).json({ OK: false, message: 'bad phone number' });
 		}
-		const contact = await getContact(phone);
-		if (!contact || !contact._id) {
+		const contactPhone = await getContact(phone);
+		if (!contactPhone || !contactPhone._id) {
 			log('contact not found', 'WARNING', __filename, { size: req.body.size }, user.id);
 			res.status(404).json({ OK: false, message: 'contact not found' });
 			return;
 		}
-		req.body.ContactID = contact._id;
+		contact = contactPhone._id.toString();
 	}
 
 	const size = req.body.size ?? 50;
 	const msgList: Array<InstanceType<typeof Message>> = [];
-	await Message.find({ contactID: req.body.ContactID }, null, {
+	await Message.find({ contactID: { $eq: contact } }, null, {
 		limit: size,
-		skip: req.body.page ?? 0 * size
+		skip: req.body.page ?? 0 * size,
+		sort: { date: 1 }
 	})
 		.sort({ sendAt: -1 })
 		.cursor()

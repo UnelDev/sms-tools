@@ -20,6 +20,7 @@ class apiClass {
 		smsSender.sendSms(
 			contact,
 			'your message has been received by ' + this.name + ', but the service has no response to give you',
+			undefined,
 			this.name
 		);
 	}

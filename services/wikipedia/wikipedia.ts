@@ -16,7 +16,7 @@ class wikipedia extends ServicesClass {
 	}
 
 	async newMessage(user: InstanceType<typeof User>, message: string, smsSender: SmsSender) {
-		const language = (await WikipediaModel.findOne({ senderID: user._id }, ['language']))?.language ?? 'en';
+		const language = (await WikipediaModel.findOne({ userID: user._id }, ['language']))?.language ?? 'en';
 		if (message.startsWith('event')) {
 			message = message.replace('event', '');
 			this.event(user, message, language, smsSender);
@@ -35,14 +35,16 @@ ${bolderize('search')} <element>: Search something on Wikipedia
 ${bolderize('selectLanguage | sl')} <language>: Change the Wikipedia language
 ${bolderize('event')} <number>: See all events that happened on this date
 			
-${bolderize('home')}: Go back to the main menu`
+${bolderize('home')}: Go back to the main menu`,
+				undefined,
+				this.name
 			);
 		}
 	}
 
 	private async search(user: InstanceType<typeof User>, message: string, language: string, smsSender: SmsSender) {
 		if (message.trim() == '') {
-			smsSender.sendSms(user, 'Usage: search <terms>\nfor exemple:\nsearch batman');
+			smsSender.sendSms(user, 'Usage: search <terms>\nfor exemple:\nsearch batman', undefined, this.name);
 			return;
 		}
 		wiki.setLang(language);
@@ -53,7 +55,9 @@ ${bolderize('home')}: Go back to the main menu`
 			smsSender.sendSms(
 				user,
 				`This page is a disambiguation page.\ninformation on this search:\n${categories.extract} \npage link: ` +
-					page.fullurl
+					page.fullurl,
+				undefined,
+				this.name
 			);
 		} else {
 			const intro = await page.intro();
@@ -62,7 +66,7 @@ ${bolderize('home')}: Go back to the main menu`
 				// Adding the paging sections
 				const maxSmsLength = 1600 - 16;
 				if (Math.max(...splitPage.map(str => str.length)) > maxSmsLength) {
-					smsSender.sendSms(user, 'This page is too large to send');
+					smsSender.sendSms(user, 'This page is too large to send', undefined, this.name);
 					return;
 				}
 
@@ -72,8 +76,8 @@ ${bolderize('home')}: Go back to the main menu`
 				});
 				return;
 			}
-			smsSender.sendSms(user, intro);
-			smsSender.sendSms(user, 'Attached link:\n' + page.fullurl);
+			smsSender.sendSms(user, intro, undefined, this.name);
+			smsSender.sendSms(user, 'Attached link:\n' + page.fullurl, undefined, this.name);
 		}
 	}
 
@@ -85,20 +89,29 @@ ${bolderize('home')}: Go back to the main menu`
 			if (selectLanguage != false) {
 				smsSender.sendSms(
 					user,
-					'You have selected ' + selectLanguage[Object.keys(selectLanguage)[0]] + ' language for Wikipedia.'
+					'You have selected ' + selectLanguage[Object.keys(selectLanguage)[0]] + ' language for Wikipedia.',
+					undefined,
+					this.name
 				);
 				await WikipediaModel.updateOne(
-					{ senderID: user._id },
+					{ userID: user._id },
 					{ language: Object.keys(selectLanguage)[0] },
 					{ upsert: true, setDefaultsOnInsert: true }
 				);
 			} else {
-				smsSender.sendSms(user, 'Language is unknown. Select another one. eg: fr, de, en');
+				smsSender.sendSms(
+					user,
+					'Language is unknown. Select another one. eg: fr, de, en',
+					undefined,
+					this.name
+				);
 			}
 		} else {
 			smsSender.sendSms(
 				user,
-				'no language specified, enter selectLanguage <language>,\n for exemple:\n selectLanguage en'
+				'no language specified, enter selectLanguage <language>,\n for exemple:\n selectLanguage en',
+				undefined,
+				this.name
 			);
 		}
 		function existInLanguage(language: languageResult[], search: string) {
@@ -116,13 +129,13 @@ ${bolderize('home')}: Go back to the main menu`
 			wiki.setLang(language);
 			const events = await wiki.onThisDay({ type: 'selected' });
 			if (events.selected == undefined) {
-				smsSender.sendSms(user, 'Error in Wikipedia');
+				smsSender.sendSms(user, 'Error in Wikipedia', undefined, this.name);
 				return;
 			}
 			if (message.trim() != '') {
 				const target = parseInt(message.trim());
 				if (isNaN(target) || target >= events.selected?.length - 1) {
-					smsSender.sendSms(user, 'Invalid number');
+					smsSender.sendSms(user, 'Invalid number', undefined, this.name);
 					return;
 				} else {
 					smsSender.sendSms(
@@ -131,7 +144,9 @@ ${bolderize('home')}: Go back to the main menu`
 							events.selected[target].text
 						}\nAttached links:${crearteLinkList(events.selected[target].pages)}\nPage [${target}/${
 							events.selected.length - 1
-						}]`
+						}]`,
+						undefined,
+						this.name
 					);
 				}
 			} else {
@@ -141,11 +156,13 @@ ${bolderize('home')}: Go back to the main menu`
 						events.selected[0].text
 					}\nAttached links:${crearteLinkList(events.selected[0].pages)}\nPage [${0}/${
 						events.selected.length - 1
-					}]`
+					}]`,
+					undefined,
+					this.name
 				);
 			}
 		} catch (error) {
-			smsSender.sendSms(user, 'Error in Wikipedia');
+			smsSender.sendSms(user, 'Error in Wikipedia', undefined, this.name);
 		}
 
 		function crearteLinkList(page: wikiSummary[]) {

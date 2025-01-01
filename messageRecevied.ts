@@ -3,7 +3,7 @@ import { User } from './models/user.model';
 import ServicesClass from './services/service';
 import { log } from './tools/log';
 import { SmsSender } from './tools/sendSms';
-import { bolderize } from './tools/tools';
+import { bolderize, getOrCreateContact } from './tools/tools';
 
 async function messageRecevied(
 	message: string,
@@ -14,13 +14,19 @@ async function messageRecevied(
 ) {
 	message = message.trim().toLowerCase();
 	log(`Message received`, 'INFO', __filename, { message, user }, user?._id.toString());
+	const contact = await getOrCreateContact(user.phoneNumber);
+	if (!contact) {
+		log('error in creating contact', 'ERROR', __filename, { user, contact }, user.id);
+		return;
+	}
 	const messageObj = new Message({
-		senderID: user._id,
+		userID: user._id,
 		message,
 		direction: true,
 		status: 'received',
 		messageId,
-		deliveredAt: new Date()
+		deliveredAt: new Date(),
+		contactID: contact.id
 	}).save();
 	//go to home menu
 	if (message.startsWith('home') || message.startsWith("'home")) {
