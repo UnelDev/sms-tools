@@ -67,9 +67,9 @@ export async function log(
 	}
 
 	console.log(
-		`(${date}) ${location ? '[' + location + ']' : ''}> ${coloredImpact} ${text} ${
-			data != null ? JSON.stringify(data) : ''
-		}\n`
+		`(${date}) ${location ? '[' + location + ']' : ''}${
+			initiator != 'root' ? ' [' + initiator + ']' : ''
+		}> ${coloredImpact} ${text}\n`
 	);
 	// append log
 	if (bddSaving) {

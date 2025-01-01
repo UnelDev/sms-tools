@@ -5,7 +5,7 @@ import login from './router/login';
 
 const router = Router();
 router.post('/login', login);
-router.get('/getMessage', getMessage);
+router.post('/getMessage', getMessage);
 router.get('/getProgress', getProgress);
 
 export default router;

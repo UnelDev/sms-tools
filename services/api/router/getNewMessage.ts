@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import authenticate from '../../../tools/authentificate';
+import authenticate from '../authentificate';
 import { checkParameters } from '../../../tools/tools';
 import { log } from '../../../tools/log';
 

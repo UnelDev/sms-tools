@@ -13,7 +13,6 @@ async function messageRecevied(
 	smsSender: SmsSender
 ) {
 	message = message.trim().toLowerCase();
-
 	log(`Message received`, 'INFO', __filename, { message, user }, user?._id.toString());
 	const messageObj = new Message({
 		senderID: user._id,

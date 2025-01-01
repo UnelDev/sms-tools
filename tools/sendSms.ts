@@ -21,7 +21,7 @@ class SmsSender {
 
 	private async sendMessage() {
 		if (this.runing) return;
-		if (this.pending.length == 0) {
+		if (!this.pending || this.pending.length == 0) {
 			this.runing = false;
 			return;
 		}
@@ -91,59 +91,7 @@ class SmsSender {
 		}).save();
 
 		this.pending.push({ phoneNumber: phone, message, messageObj });
+		if (!this.runing) this.sendMessage();
 	}
 }
-
-async function sendSms2(
-	contact: InstanceType<typeof Contact>,
-	message: string,
-	initiator?: string,
-	sendUser?: InstanceType<typeof User>
-): Promise<void>;
-async function sendSms2(
-	contact: InstanceType<typeof User>,
-	message: string,
-	initiator?: string,
-	sendUser?: InstanceType<typeof User>
-): Promise<void>;
-async function sendSms2(
-	contact: InstanceType<typeof Contact> | InstanceType<typeof User>,
-	message: string,
-	initiator: string = 'root',
-	sendUser?: InstanceType<typeof User>
-): Promise<void> {
-	const phone = clearPhone(contact.phoneNumber);
-	if (!phone) {
-		log('Bad phone:', 'ERROR', __filename, { message, contact }, initiator);
-		return;
-	}
-
-	const options = {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization:
-				'Basic ' + Buffer.from(`${process.env.SMS_USERNAME}:${process.env.PASSWORD}`).toString('base64')
-		},
-		body: JSON.stringify({
-			message,
-			phoneNumbers: [phone]
-		})
-	};
-
-	const messageObj = new Message({
-		contactID: contact._id,
-		message,
-		direction: false,
-		sendUser
-	}).save();
-	const res = await (await fetch(process.env.GATEWAY_URL + '/message', options)).json();
-	if (!res.id) {
-		log('Error sending message: ' + res, 'ERROR', __filename, initiator);
-		return;
-	}
-	await Message.findByIdAndUpdate((await messageObj)._id, { messageId: res.id });
-	log('Message sent', 'INFO', __filename, { message, contact }, initiator);
-}
-
-export { sendSms2 as sendSms, SmsSender };
+export { SmsSender };

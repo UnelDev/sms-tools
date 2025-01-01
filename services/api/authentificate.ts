@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { log } from './log';
+import { log } from '../../tools/log';
 import { Request, Response } from 'express';
 
 function authenticate(
@@ -31,7 +31,7 @@ function authenticate(
 		| undefined = jwt.verify(token, process.env.privateJWTkey ?? 'error', (err, user) => {
 		if (err) {
 			log('invalid token', 'WARNING', __filename, { ip: req.hostname });
-			res.status(400).send({ message: `invalid token`, OK: false });
+			res.status(401).send({ message: `invalid token`, OK: false });
 			return undefined;
 		}
 		return user;

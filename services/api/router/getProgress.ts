@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import authenticate from '../../../tools/authentificate';
+import authenticate from '../authentificate';
 import { Message } from '../../../models/message.model';
 import { log } from '../../../tools/log';
 

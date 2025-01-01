@@ -132,6 +132,6 @@ app.get('/getNewMessage', (req, res) => getNewMessage(req, res, SseSuscriber));
 //app.use(router);
 
 //////////////////////////create class/////////////////////////////////////////////
-const servicesClass = loadServices(app);
 const smsSender = new SmsSender();
+const servicesClass = loadServices(app);
 const SseSuscriber = new Map<mongoose.Types.ObjectId, Array<(message: string) => void>>(); // Map<phone, sseSender>;

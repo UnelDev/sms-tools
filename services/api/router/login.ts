@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { User } from '../../../models/user.model';
-import { checkParameters, clearPhone } from '../../../tools/tools';
+import { checkParameters, clearPhone, phoneNumberCheck } from '../../../tools/tools';
 import { log } from '../../../tools/log';
 /**
  * Handles user login by verifying the provided phone number and password.
@@ -30,8 +30,12 @@ async function login(req: Request<any>, res: Response<any>) {
 	)
 		return;
 	const phoneNumber = clearPhone(req.body.phone);
+	if (!phoneNumberCheck(phoneNumber)) {
+		res.status(400).json({ OK: false, message: 'bad phone number format' });
+	}
 	const password = req.body.password;
-	const foundUser = await User.findOne({ phoneNumber, password });
+	console.log({ phoneNumber, password });
+	const foundUser = await User.findOne({ phoneNumber: { $eq: phoneNumber }, password: { $eq: password } });
 	if (foundUser) {
 		const user = { id: foundUser._id, phoneNumber };
 		const token = jwt.sign(user, process.env.privateJWTkey ?? 'error', { expiresIn: '1d' });
@@ -43,7 +47,6 @@ async function login(req: Request<any>, res: Response<any>) {
 			ip: req.hostname
 		});
 	} else {
-		console.log(req.body);
 		res.status(401).json({ OK: false, message: 'bad phone number or password' });
 		log(`Failed login attempt for phone number: ${req.body.phone}`, 'WARNING', __filename, {
 			phone: req.body.phone,
