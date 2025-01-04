@@ -135,4 +135,4 @@ app.get('/getNewMessage', (req, res) => getNewMessage(req, res, SseSuscriber));
 
 //////////////////////////create class/////////////////////////////////////////////
 const smsSender = new SmsSender();
-const servicesClass = loadServices(app, SseSuscriber);
+const servicesClass = loadServices(app, SseSuscriber, smsSender);

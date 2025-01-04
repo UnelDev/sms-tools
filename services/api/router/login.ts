@@ -32,6 +32,11 @@ async function login(req: Request<any>, res: Response<any>) {
 	const phoneNumber = clearPhone(req.body.phone);
 	if (!phoneNumberCheck(phoneNumber)) {
 		res.status(400).json({ OK: false, message: 'bad phone number format' });
+		log(`Invalid phone number format: ${req.body.phone}`, 'WARNING', __filename, {
+			phone: req.body.phone,
+			ip: req.hostname
+		});
+		return;
 	}
 	const password = req.body.password;
 	console.log({ phoneNumber, password });

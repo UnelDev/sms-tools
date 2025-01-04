@@ -6,6 +6,7 @@ import { Contact } from '../models/contact.model';
 import { User } from '../models/user.model';
 import ServicesClass from '../services/service';
 import { log } from './log';
+import { SmsSender } from './sendSms';
 /**
  * Converts the input text to a bold Unicode variant.
  *
@@ -109,7 +110,8 @@ async function getUser(phoneNumber: string): Promise<InstanceType<typeof User> |
 
 async function loadServices(
 	expressServer: Express,
-	SseSuscriber: Map<string, Array<(message: string) => void>>
+	SseSuscriber: Map<string, Array<(message: string) => void>>,
+	smsSender: SmsSender
 ): Promise<Array<ServicesClass>> {
 	const services: Array<ServicesClass> = [];
 	const servicesDir = path.resolve(__dirname, '../services');
@@ -137,7 +139,7 @@ async function loadServices(
 					const router = await import(routerPath);
 					if (router.default) {
 						// use routes /name/helloWorld . inject SseSuscriber if sse subscription is requied
-						expressServer.use('/' + dir.name, router.default(SseSuscriber));
+						expressServer.use('/' + dir.name, router.default(SseSuscriber, smsSender));
 						log(`new router added from ${routerPath} services`, 'INFO', __filename);
 					} else {
 						log(`no router found on ${routerPath}`, 'ERROR', __filename);
@@ -201,6 +203,9 @@ async function getOrCreateUser(phoneNumber: string) {
 
 /**
  * Check if the parameters are in the body
+ * this fonction send response.
+ *
+ * /!\ **dont use res** after this function
  * @param body
  * @param res
  * @param parameters - Array of [string, any, bolean?] where the first string is the name of the parameter and the second is the type of the parameter, the third is optional and is a boolean to check if the parameter is optional

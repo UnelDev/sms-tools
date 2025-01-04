@@ -64,7 +64,7 @@ class SmsSender {
 		message: string,
 		user?: InstanceType<typeof User>,
 		initiator: string = 'root'
-	): Promise<void> {
+	): Promise<InstanceType<typeof Message> | void> {
 		const phone = clearPhone(contact.phoneNumber);
 		if (!phone) {
 			log('Bad phone:', 'ERROR', __filename, { message, contact }, initiator);
@@ -85,11 +85,13 @@ class SmsSender {
 			message,
 			direction: false,
 			userID: user,
-			initiator
+			initiator,
+			status: 'pending'
 		}).save();
 
 		this.pending.push({ phoneNumber: phone, message, messageObj });
 		if (!this.runing) this.sendMessage();
+		return messageObj;
 	}
 }
 export { SmsSender };
