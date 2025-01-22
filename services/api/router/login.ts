@@ -39,7 +39,6 @@ async function login(req: Request<any>, res: Response<any>) {
 		return;
 	}
 	const password = req.body.password;
-	console.log({ phoneNumber, password });
 	const foundUser = await User.findOne({ phoneNumber: { $eq: phoneNumber }, password: { $eq: password } });
 	if (foundUser) {
 		const user = { id: foundUser._id, phoneNumber };

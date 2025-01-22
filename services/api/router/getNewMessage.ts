@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
+import { log } from '../../../tools/log';
 import { checkParameters, clearPhone, getContact, phoneNumberCheck } from '../../../tools/tools';
 import authenticate from '../authentificate';
-import { log } from '../../../tools/log';
 
 async function getNewMessage(
 	req: Request<any>,

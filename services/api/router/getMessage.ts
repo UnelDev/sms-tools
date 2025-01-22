@@ -4,6 +4,28 @@ import authenticate from '../authentificate';
 import { checkParameters, clearPhone, getContact, getUser, phoneNumberCheck } from '../../../tools/tools';
 import { log } from '../../../tools/log';
 
+/**
+ * Retrieves messages for a given contact by validating the request parameters and phone number.
+ * If the parameters are valid, messages are fetched and a success response is returned.
+ * If the parameters are invalid, an appropriate error response is returned.
+ *
+ * @param req - The request object containing the message query details.
+ * @param res - The response object to send the result.
+ *
+ * @example
+ * body: {
+ *  "ContactID": "60d0fe4f5311236168a109ca",
+ *  "phoneNumber": "+1234567890",
+ *  "page": 1,
+ *  "size": 50
+ * }
+ *
+ * @throws {400} at least one of these two arguments must be provided: ContactID, phoneNumber
+ * @throws {400} bad phone number
+ * @throws {404} contact not found
+ * @throws {418} to big request
+ * @returns {200} messages retrieved successfully
+ */
 async function getMessage(req: Request<any>, res: Response<any>) {
 	const user = authenticate(req, res);
 	if (
