@@ -58,7 +58,6 @@ async function getNewMessage(
 		const subscribers = SseSubscribers.get(contactId.toString()) || [];
 		const sendMessage = (message: string) => {
 			try {
-				console.log('sse send');
 				res.write(`${JSON.stringify(message)}`);
 			} catch (error) {
 				log('Error sending SSE message', 'ERROR', __filename, { contactId, error }, user.id);

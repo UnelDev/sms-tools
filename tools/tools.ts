@@ -178,27 +178,10 @@ async function createContact(phoneNumber: string): Promise<InstanceType<typeof C
 	return contact;
 }
 
-async function createUser(phoneNumber: string): Promise<InstanceType<typeof User> | undefined> {
-	const user = await User.create({
-		phoneNumber: clearPhone(phoneNumber)
-	});
-	if (!user) {
-		log('error in creating user', 'WARNING', __filename);
-		return;
-	}
-	return user;
-}
-
 async function getOrCreateContact(phoneNumber: string): Promise<InstanceType<typeof Contact> | undefined> {
 	let contact = await getContact(phoneNumber);
 	if (!contact) contact = await createContact(phoneNumber);
 	return contact;
-}
-
-async function getOrCreateUser(phoneNumber: string) {
-	let User = await getUser(phoneNumber);
-	if (!User) User = await createUser(phoneNumber);
-	return User;
 }
 
 /**
@@ -298,11 +281,9 @@ export {
 	checkParameters,
 	clearPhone,
 	createContact,
-	createUser,
 	getContact,
 	getFileName,
 	getOrCreateContact,
-	getOrCreateUser,
 	getUser,
 	IsPhoneNumber,
 	loadServices,

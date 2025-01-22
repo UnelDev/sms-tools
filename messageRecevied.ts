@@ -1,10 +1,9 @@
 import { Contact } from './models/contact.model';
 import { Message } from './models/message.model';
-import { User } from './models/user.model';
 import ServicesClass from './services/service';
 import { log } from './tools/log';
 import { SmsSender } from './tools/sendSms';
-import { bolderize, getOrCreateContact, getOrCreateUser } from './tools/tools';
+import { bolderize, getUser } from './tools/tools';
 
 async function messageRecevied(
 	message: string,
@@ -15,11 +14,10 @@ async function messageRecevied(
 ) {
 	message = message.trim().toLowerCase();
 	log(`Message received`, 'INFO', __filename, { message, user: contact }, contact?._id.toString());
-	const user = await getOrCreateUser(contact.phoneNumber);
-	if (!user) {
-		log('error in creating contact', 'ERROR', __filename, { user: user, contact }, contact.id);
-		return;
-	}
+	const user = await getUser(contact.phoneNumber);
+	//if this phone is not  an  user command is forbidden
+	if (!user) return;
+
 	const messageObj = new Message({
 		userID: user._id,
 		message,
@@ -53,6 +51,7 @@ async function messageRecevied(
 				serv.newMessage(user, message, smsSender);
 			}
 		});
+		console.log('if user is in service');
 		//if user is in service
 		if (user.currentServices != 'nothing') {
 			const service = (await servicesClass).find(e => e.name == user.currentServices);
@@ -66,6 +65,7 @@ async function messageRecevied(
 		const messageSplit = message.split(' ');
 		const firstWorld = messageSplit.at(0);
 		const firstWorldNumber = parseInt(firstWorld ?? 'a');
+		console.log('if first part is an number');
 		//if first part is an number
 		if (!isNaN(firstWorldNumber)) {
 			const service = (await servicesClass).at(firstWorldNumber);
@@ -81,6 +81,7 @@ async function messageRecevied(
 		}
 
 		//if first part is an service name
+		console.log('if first part is an service name');
 		if (firstWorld) {
 			const serv = (await servicesClass).find(e => e.name == firstWorld);
 			if (serv) {
@@ -95,13 +96,14 @@ async function messageRecevied(
 		}
 
 		//other case
+		console.log('other case');
 		smsSender.sendSms(
 			user,
 			`Select an application:
-${(await servicesClass).map((el, i) => {
-	return bolderize(i.toString() + ': ' + el.name) + ' ' + el.description + '\n';
-})}
-${bolderize('home')}: return on this menu`
+	${(await servicesClass).map((el, i) => {
+		return bolderize(i.toString() + ': ' + el.name) + ' ' + el.description + '\n';
+	})}
+	${bolderize('home')}: return on this menu`
 		);
 	} else {
 		(await servicesClass).forEach(async serv => {

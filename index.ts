@@ -96,7 +96,6 @@ app.post('/sms', async (req, res) => {
 	}
 
 	//send to all sse suscrible client
-	console.log(SseSuscriber, contact._id, SseSuscriber.get(contact._id.toString()));
 	if (SseSuscriber.has(contact._id.toString())) SseSuscriber.get(contact._id.toString())?.forEach(f => f(message));
 
 	//pass to other app

@@ -14,6 +14,7 @@ class SmsSender {
 	}>;
 	runing: boolean;
 	constructor() {
+		//android limitation for sms send
 		this.timeBetwenSend = 5000;
 		this.pending = [];
 		this.runing = false;
@@ -52,7 +53,7 @@ class SmsSender {
 			log('Message sent', 'INFO', __filename, { message: msg.message, contact: msg.phoneNumber }, msg.initiator);
 		}
 
-		if (this.pending.length != 0) {
+		if (this.pending.length == 0) {
 			this.runing = false;
 			return;
 		}
