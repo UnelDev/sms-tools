@@ -10,16 +10,13 @@ async function messageRecevied(
 	contact: InstanceType<typeof Contact>,
 	messageId: string,
 	servicesClass: Promise<Array<ServicesClass>>,
-	smsSender: SmsSender
+	smsSender: SmsSender,
+	SseSuscriber: Map<string, Array<(message: InstanceType<typeof Message>) => void>>
 ) {
 	message = message.trim().toLowerCase();
 	log(`Message received`, 'INFO', __filename, { message, user: contact }, contact?._id.toString());
-	const user = await getUser(contact.phoneNumber);
-	//if this phone is not  an  user command is forbidden
-	if (!user) return;
 
-	const messageObj = new Message({
-		userID: user._id,
+	const messageObj = await new Message({
 		message,
 		direction: true,
 		status: 'received',
@@ -27,6 +24,13 @@ async function messageRecevied(
 		deliveredAt: new Date(),
 		contactID: contact.id
 	}).save();
+
+	//send to all sse suscrible client
+	if (SseSuscriber.has(contact._id.toString())) SseSuscriber.get(contact._id.toString())?.forEach(f => f(messageObj));
+
+	const user = await getUser(contact.phoneNumber);
+	//if this phone is not  an  user command is forbidden
+	if (!user) return;
 	//go to home menu
 	if (message.startsWith('home') || message.startsWith("'home")) {
 		message = message.replace('home', '');
@@ -51,7 +55,6 @@ async function messageRecevied(
 				serv.newMessage(user, message, smsSender);
 			}
 		});
-		console.log('if user is in service');
 		//if user is in service
 		if (user.currentServices != 'nothing') {
 			const service = (await servicesClass).find(e => e.name == user.currentServices);
@@ -65,7 +68,6 @@ async function messageRecevied(
 		const messageSplit = message.split(' ');
 		const firstWorld = messageSplit.at(0);
 		const firstWorldNumber = parseInt(firstWorld ?? 'a');
-		console.log('if first part is an number');
 		//if first part is an number
 		if (!isNaN(firstWorldNumber)) {
 			const service = (await servicesClass).at(firstWorldNumber);
@@ -81,7 +83,6 @@ async function messageRecevied(
 		}
 
 		//if first part is an service name
-		console.log('if first part is an service name');
 		if (firstWorld) {
 			const serv = (await servicesClass).find(e => e.name == firstWorld);
 			if (serv) {
@@ -96,7 +97,6 @@ async function messageRecevied(
 		}
 
 		//other case
-		console.log('other case');
 		smsSender.sendSms(
 			user,
 			`Select an application:

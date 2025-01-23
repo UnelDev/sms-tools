@@ -51,7 +51,6 @@ ${bolderize('home')}: Go back to the main menu`,
 		const page = await wiki.page(message);
 		const categories = await page.summary();
 		if (categories.type == 'disambiguation') {
-			console.log();
 			smsSender.sendSms(
 				user,
 				`This page is a disambiguation page.\ninformation on this search:\n${categories.extract} \npage link: ` +

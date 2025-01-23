@@ -1,14 +1,17 @@
 import { Router } from 'express';
+import { Message } from '../../models/message.model';
+import { SmsSender } from '../../tools/sendSms';
+import createContact from './router/createContact';
 import getMessage from './router/getMessage';
+import getNewMessage from './router/getNewMessage';
 import getProgress from './router/getProgress';
 import login from './router/login';
-import getNewMessage from './router/getNewMessage';
-import mongoose from 'mongoose';
-import { SmsSender } from '../../tools/sendSms';
 import sendSms from './router/sendSms';
-import createContact from './router/createContact';
 
-function router(SseSuscriber: Map<string, Array<(message: string) => void>>, smsSender: SmsSender) {
+function router(
+	SseSuscriber: Map<string, Array<(message: InstanceType<typeof Message>) => void>>,
+	smsSender: SmsSender
+) {
 	const route = Router();
 
 	route.post('/login', login);

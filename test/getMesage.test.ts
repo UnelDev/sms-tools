@@ -38,7 +38,6 @@ describe('POST /getMessage', () => {
 	// 		.post('/getMessage')
 	// 		.set('Authorization', `Bearer ${token}`)
 	// 		.send({ clientID: 'clientPhone' });
-	// 	console.log(response.body);
 	// 	expect(response.status).toBe(200);
 	// 	expect(response.body).toHaveLength(1);
 	// 	expect(response.body[0].text).toBe('Hello');

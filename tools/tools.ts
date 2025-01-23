@@ -1,8 +1,9 @@
-import { RequestHandler, Response, Express } from 'express';
+import { Express, Response } from 'express';
 import mongoose from 'mongoose';
 import fs from 'node:fs';
 import path from 'path';
 import { Contact } from '../models/contact.model';
+import { Message } from '../models/message.model';
 import { User } from '../models/user.model';
 import ServicesClass from '../services/service';
 import { log } from './log';
@@ -79,18 +80,15 @@ function clearPhone(phoneNumber: string): string {
 }
 
 function phoneNumberCheck(phone: string): boolean {
-	// console.log(phone);
 	if (typeof phone != 'string') return false;
 	if (!phone.startsWith('+')) return false;
 
 	const phoneArray = phone.split('');
-	// console.log(phone.length);
 	if (phone.length % 2 == 0) {
 		phoneArray.splice(0, 3);
 	} else {
 		phoneArray.splice(0, 4);
 	}
-	// console.log(phone);
 	phone = phoneArray.join('');
 	if (phone.match(/^[0-9]{9}$/)) return true;
 	return false;
@@ -110,7 +108,7 @@ async function getUser(phoneNumber: string): Promise<InstanceType<typeof User> |
 
 async function loadServices(
 	expressServer: Express,
-	SseSuscriber: Map<string, Array<(message: string) => void>>,
+	SseSuscriber: Map<string, Array<(message: InstanceType<typeof Message>) => void>>,
 	smsSender: SmsSender
 ): Promise<Array<ServicesClass>> {
 	const services: Array<ServicesClass> = [];
@@ -146,7 +144,6 @@ async function loadServices(
 					}
 				}
 			} catch (error) {
-				console.error(error);
 				log(`error on import of ${dir.name}`, 'ERROR', __filename, { error });
 			}
 		}

@@ -165,7 +165,6 @@ y/n`
 	private ConvertInMs(dateString: string): Date | undefined {
 		if (!/^\d{2}\/\d{2}\/\d{2} \d{2}:\d{2}$/.test(dateString)) return undefined;
 
-		console.log(dateString);
 		const [datePart, timePart] = dateString.split(' ');
 		const [day, month, year] = datePart.split('/');
 		const [hours, minutes] = timePart.split(':');

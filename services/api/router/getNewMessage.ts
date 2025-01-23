@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { Message } from '../../../models/message.model';
 import { log } from '../../../tools/log';
 import { checkParameters, clearPhone, getContact, phoneNumberCheck } from '../../../tools/tools';
 import authenticate from '../authentificate';
@@ -6,7 +7,7 @@ import authenticate from '../authentificate';
 async function getNewMessage(
 	req: Request<any>,
 	res: Response<any>,
-	SseSubscribers: Map<string, Array<(message: string) => void>>
+	SseSubscribers: Map<string, Array<(message: InstanceType<typeof Message>) => void>>
 ) {
 	try {
 		const user = authenticate(req, res);
@@ -56,7 +57,7 @@ async function getNewMessage(
 
 		// aff callback to sse shared object
 		const subscribers = SseSubscribers.get(contactId.toString()) || [];
-		const sendMessage = (message: string) => {
+		const sendMessage = (message: InstanceType<typeof Message>) => {
 			try {
 				res.write(`${JSON.stringify(message)}`);
 			} catch (error) {

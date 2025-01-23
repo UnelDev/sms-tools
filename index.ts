@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 import { AddressInfo } from 'net';
 import { eventDelivered, eventfailed, eventSent } from './messageEvent';
 import messageRecevied from './messageRecevied';
+import { Message } from './models/message.model';
 import getNewMessage from './services/api/router/getNewMessage';
 import { log } from './tools/log';
 import { SmsSender } from './tools/sendSms';
@@ -18,7 +19,7 @@ app.use(express.json());
 app.use(cors());
 
 //////////////////////////create sse object/////////////////////////////////////////////
-const SseSuscriber = new Map<string, Array<(message: string) => void>>(); // Map<phone, sseSender>;
+const SseSuscriber = new Map<string, Array<(message: InstanceType<typeof Message>) => void>>(); // Map<phone, sseSender>;
 //////////////////////////data base/////////////////////////////////////////////
 
 // in test, the test script will create the connection to the database
@@ -94,12 +95,8 @@ app.post('/sms', async (req, res) => {
 		log('error for create user', 'WARNING', __filename);
 		return;
 	}
-
-	//send to all sse suscrible client
-	if (SseSuscriber.has(contact._id.toString())) SseSuscriber.get(contact._id.toString())?.forEach(f => f(message));
-
 	//pass to other app
-	messageRecevied(message, contact, req.body.id, servicesClass, smsSender);
+	messageRecevied(message, contact, req.body.id, servicesClass, smsSender, SseSuscriber);
 });
 
 app.post('/sent', (req, res) => {

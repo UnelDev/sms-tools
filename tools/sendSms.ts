@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongoose';
 import { Contact } from '../models/contact.model';
 import { Message } from '../models/message.model';
 import { User } from '../models/user.model';
