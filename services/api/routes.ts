@@ -7,6 +7,7 @@ import getNewMessage from './router/getNewMessage';
 import getProgress from './router/getProgress';
 import login from './router/login';
 import sendSms from './router/sendSms';
+import getContact from './router/getContact';
 
 function router(
 	SseSuscriber: Map<string, Array<(message: InstanceType<typeof Message>) => void>>,
@@ -20,6 +21,7 @@ function router(
 	route.get('/getProgress', getProgress);
 	route.post('/getNewMessage', (req, res) => getNewMessage(req, res, SseSuscriber));
 	route.post('/sendSms', (req, res) => sendSms(req, res, smsSender));
+	route.post('/getContact', getContact);
 
 	return route;
 }

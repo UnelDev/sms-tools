@@ -183,17 +183,24 @@ async function getOrCreateContact(phoneNumber: string): Promise<InstanceType<typ
 
 /**
  * Check if the parameters are in the body
- * this fonction send response.
+ * this fonction send response if result is false
+ * pass Array of [string, type, bolean?]
+ * 	string is the name of parameter
+ * 	type is the type of parameters. if type is 'function' the function is executed, if she retrun true this parameters is not valid
+ * 	bolean, this parameter is optional ? true is optional
  *
- * /!\ **dont use res** after this function
+ * /!\ **dont use res** after this function. this fonction send response if result is false
  * @param body
  * @param res
- * @param parameters - Array of [string, any, bolean?] where the first string is the name of the parameter and the second is the type of the parameter, the third is optional and is a boolean to check if the parameter is optional
+ * @param parameters - Array of [string, type, bolean?] where the first string is the name of the parameter and the second is the type of the parameter, the third is optional and is a boolean to check if the parameter is optional
  * @param orgin
- * @returns boolean - true if all parameters are in the body
+ * @returns boolean - true if all parameters are in the body, false if not. this fonction send response if result is false
  *
  * @throws 400 - Missing parameters body is empty
  * @throws 400 - Missing parameters ( first parameter missing)
+ *
+ * @version 2.2
+ * @author [unelDev](https://github.com/unelDev)
  */
 function checkParameters(
 	body: any,
@@ -201,7 +208,17 @@ function checkParameters(
 	parameters: Array<
 		[
 			string,
-			'string' | 'number' | 'bigint' | 'boolean' | 'symbol' | 'undefined' | 'object' | 'function' | 'ObjectId',
+			(
+				| 'string'
+				| 'number'
+				| 'bigint'
+				| 'boolean'
+				| 'symbol'
+				| 'undefined'
+				| 'object'
+				| 'ObjectId'
+				| ((params: String) => boolean)
+			),
 			// | 'array' dont work with array
 			boolean?
 		]
@@ -210,16 +227,23 @@ function checkParameters(
 ): boolean {
 	const ip = res.req.hostname;
 	if (parameters.length == 0) return true;
-	if (!body || Object.keys(body).length == 0) {
+	/*
+	- if body is undefined
+	- if body is empty
+	- if all parameter is optional
+	*/
+	if (!body || (Object.keys(body).length == 0 && parameters.some(el => el[2] != true))) {
 		res.status(400).send({ message: 'Missing parameters body is empty', OK: false });
 		log(`Missing parameters body is empty from ` + ip, 'WARNING', orgin);
 		return false;
 	}
 	for (let parameter of parameters) {
+		// if the parameter is optional and parameter is not in body
 		if (parameter[2] && !body[parameter[0]]) {
 			continue;
 		}
 
+		//parameter is not in body
 		if (body[parameter[0]] == undefined) {
 			res.status(400).send({ message: `Missing parameters (${parameter.join(':')})`, OK: false });
 			log(`Missing parameters (${parameter.join(':')}) from ` + ip, 'WARNING', orgin);
@@ -230,7 +254,15 @@ function checkParameters(
 			parameter[0]
 		]} but required type is ${parameter[1]})`;
 
-		if (parameter[1] == 'ObjectId') {
+		if (parameter[1] == 'number' && isNaN(parseInt(body[parameter[0]]))) {
+			// if is nan return Missing parameters because NaN == undefined
+			res.status(400).send({
+				message: errorText,
+				OK: false
+			});
+			log(errorText + ` from ` + ip, 'WARNING', orgin);
+			return false;
+		} else if (parameter[1] == 'ObjectId') {
 			if (body[parameter[0]].length != 24) {
 				res.status(400).send({
 					message: errorText,
@@ -247,22 +279,19 @@ function checkParameters(
 				log(errorText + ` from ` + ip, 'WARNING', orgin);
 				return false;
 			}
-		} else if (parameter[1] == 'number' && isNaN(parseInt(body[parameter[0]]))) {
-			// if is nan return Missing parameters because NaN == undefined
-			res.status(400).send({
-				message: errorText,
-				OK: false
-			});
-			log(errorText + ` from ` + ip, 'WARNING', orgin);
-			return false;
-			// } else if (parameter[1] == 'array' && !Array.isArray(body[parameter[0]])) {
-			// 	res.status(400).send({
-			// 		message: errorText,
-			// 		OK: false
-			// 	});
-			// 	log(errorText + ` from ` + ip, 'WARNING', orgin);
-			// 	return false;
+		} else if (typeof parameter[1] == 'function') {
+			//execute and the callback
+			//if callback == true, return. error in parameter
+			if (parameter[1](body[parameter[0]])) {
+				log(errorText + ` from ` + ip, 'WARNING', orgin);
+				res.status(400).send({
+					message: errorText,
+					OK: false
+				});
+				return false;
+			}
 		} else if (typeof body[parameter[0]] != parameter[1]) {
+			//type is not same
 			res.status(400).send({
 				message: errorText,
 				OK: false
@@ -270,9 +299,18 @@ function checkParameters(
 			log(errorText + ` from ` + ip, 'WARNING', orgin);
 			return false;
 		}
+		// dont work for array
+		// } else if (parameter[1] == 'array' && !Array.isArray(body[parameter[0]])) {
+		// 	res.status(400).send({
+		// 		message: errorText,
+		// 		OK: false
+		// 	});
+		// 	log(errorText + ` from ` + ip, 'WARNING', orgin);
+		// 	return false;
 	}
 	return true;
 }
+
 export {
 	bolderize,
 	checkParameters,

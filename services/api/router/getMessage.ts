@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { Message } from '../../../models/message.model';
-import authenticate from '../authentificate';
-import { checkParameters, clearPhone, getContact, getUser, phoneNumberCheck } from '../../../tools/tools';
 import { log } from '../../../tools/log';
+import { checkParameters, clearPhone, getContact, phoneNumberCheck } from '../../../tools/tools';
+import authenticate from '../authentificate';
 
 /**
  * Retrieves messages for a given contact by validating the request parameters and phone number.
@@ -71,18 +71,15 @@ async function getMessage(req: Request<any>, res: Response<any>) {
 		contact = contactPhone._id.toString();
 	}
 
-	const size = req.body.size ?? 50;
 	const msgList: Array<InstanceType<typeof Message>> = [];
 	await Message.find({ contactID: { $eq: contact } }, null, {
-		limit: size,
-		skip: req.body.page ?? 0 * size,
-		sort: { date: 1 }
+		limit: req.body.size ?? 0,
+		skip: req.body.page ?? 0 * req.body.size
 	})
-		.sort({ sendAt: -1 })
+		.limit(req.body.size ?? 50)
+		.sort({ date: 1 })
 		.cursor()
-		.eachAsync(msg => {
-			msgList.push(msg);
-		});
+		.eachAsync(msg => msgList.push(msg));
 	log('user reqested ' + msgList.length + ' messages', 'INFO', __filename, { size: req.body.size }, user.id);
 	res.status(200).send({ message: msgList.length + ' data send', data: msgList, OK: true });
 }

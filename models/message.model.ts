@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 const MessageModel = new mongoose.Schema({
-	date: { type: Date, default: new Date() },
+	date: { type: Date, default: Date.now },
 	contactID: { type: mongoose.Schema.ObjectId, ref: 'Contact', required: false },
 	userID: { type: mongoose.Schema.ObjectId, ref: 'User', required: false },
 	message: { type: String, required: true },

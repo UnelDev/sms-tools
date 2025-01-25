@@ -31,7 +31,7 @@ async function createContact(req: Request<any>, res: Response<any>) {
 			req.body,
 			res,
 			[
-				['ContactName', 'string', true],
+				['contactName', 'string', true],
 				['phoneNumber', 'string', true]
 			],
 			__filename
@@ -44,14 +44,14 @@ async function createContact(req: Request<any>, res: Response<any>) {
 		log('invalid phone number', 'WARNING', __filename, { phone }, user.id);
 		return;
 	}
-
-	if (req.body.ContactName.trim() == '') {
+	if (req.body.contactName && req.body.contactName.trim() == '') {
 		res.status(400).json({ OK: false, message: 'invalid contactName' });
-		log('invalid contactName', 'WARNING', __filename, { ContactName: req.body.ContactName }, user.id);
+		log('invalid contactName', 'WARNING', __filename, { contactName: req.body.contactName }, user.id);
 		return;
 	}
 
 	const data = await Contact.create({ phoneNumber: phone, contactName: req.body.contactName });
+	console.log(data);
 	if (!data) {
 		res.status(500).json({ OK: false, message: 'error on reqest' });
 		log('error on reqest', 'ERROR', __filename, { contactAdded: data }, user.id);
