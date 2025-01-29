@@ -48,7 +48,7 @@ async function getMessage(req: Request<any>, res: Response<any>) {
 		res.status(418).send('to big request');
 		return;
 	}
-	let contact = req.body.contactID;
+	let contact = req.body.ContactID;
 
 	if (!contact && !req.body.phoneNumber) {
 		log('no mutch argument', 'WARNING', __filename, { size: req.body.size }, user.id);
